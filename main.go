@@ -54,7 +54,7 @@ type Root struct {
 	passwords []Password
 }
 
-func (r *Root) Layout(context *guigui.Context, appender *guigui.ChildWidgetAppender) {
+func (r *Root) Layout(context *guigui.Context, appender *guigui.ChildWidgetAppender) error {
 	r.countOutputTextFieldText.SetText("count of output")
 	r.countOutputTextField.SetHorizontalAlign(basicwidget.HorizontalAlignEnd)
 	r.countOutputTextField.SetOnEnterPressed(func(text string) {
@@ -159,6 +159,7 @@ func (r *Root) Layout(context *guigui.Context, appender *guigui.ChildWidgetAppen
 			return p.Text == pw.text.Text()
 		})
 	})
+	return nil
 }
 
 func (r *Root) Update(context *guigui.Context) error {
