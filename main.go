@@ -87,6 +87,11 @@ func (r *Root) Layout(context *guigui.Context, appender *guigui.ChildWidgetAppen
 	r.generateButton.SetOnUp(func() {
 		r.tryGeneratePassword()
 	})
+	if r.canGeneratePassword() {
+		guigui.Enable(&r.generateButton)
+	} else {
+		guigui.Disable(&r.generateButton)
+	}
 
 	u := float64(basicwidget.UnitSize(context))
 	w, h := r.Size(context)
@@ -159,15 +164,6 @@ func (r *Root) Layout(context *guigui.Context, appender *guigui.ChildWidgetAppen
 			return p.Text == pw.text.Text()
 		})
 	})
-	return nil
-}
-
-func (r *Root) Update(context *guigui.Context) error {
-	if r.canGeneratePassword() {
-		guigui.Enable(&r.generateButton)
-	} else {
-		guigui.Disable(&r.generateButton)
-	}
 	return nil
 }
 
