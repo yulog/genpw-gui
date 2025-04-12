@@ -198,7 +198,6 @@ func (c *passwordsPanelContent) Layout(context *guigui.Context, appender *guigui
 			pw.copyButton.SetOnUp(func() {
 				clipboard.Write(clipboard.FmtText, []byte(t.Text))
 			})
-			pw.text.SetSelectable(true)
 			pw.text.SetText(t.Text)
 			pw.text.SetVerticalAlign(basicwidget.VerticalAlignMiddle)
 			root.passwordWidgets = slices.Insert(root.passwordWidgets, i, &pw)
