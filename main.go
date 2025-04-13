@@ -184,6 +184,11 @@ func (p *passwordWidget) Build(context *guigui.Context, appender *guigui.ChildWi
 	return nil
 }
 
+func (p *passwordWidget) Size(context *guigui.Context) (int, int) {
+	w, _ := guigui.Parent(p).Size(context)
+	return w, int(basicwidget.UnitSize(context))
+}
+
 type passwordsPanelContent struct {
 	guigui.DefaultWidget
 
@@ -196,7 +201,6 @@ func (c *passwordsPanelContent) Build(context *guigui.Context, appender *guigui.
 
 	root := c.root
 	p := guigui.Position(c)
-	w, _ := c.Size(context)
 	minX := p.X + int(0.5*u)
 	y := p.Y
 	for i, t := range root.passwords {
@@ -216,12 +220,8 @@ func (c *passwordsPanelContent) Build(context *guigui.Context, appender *guigui.
 		if i > 0 {
 			y += int(u / 4)
 		}
-		guigui.SetPosition(&c.passwordWidgets[i].copyButton, image.Pt(minX, y))
-		appender.AppendChildWidget(&c.passwordWidgets[i].copyButton)
-
-		c.passwordWidgets[i].text.SetSize(w-int(4.5*u), int(u))
-		guigui.SetPosition(&c.passwordWidgets[i].text, image.Pt(minX+int(3.5*u), y))
-		appender.AppendChildWidget(&c.passwordWidgets[i].text)
+		guigui.SetPosition(c.passwordWidgets[i], image.Pt(minX, y))
+		appender.AppendChildWidget(c.passwordWidgets[i])
 		y += int(u)
 	}
 
