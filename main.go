@@ -26,11 +26,6 @@ func NewPassword(text string) Password {
 	}
 }
 
-type PasswordWidgets struct {
-	copyButton basicwidget.TextButton
-	text       basicwidget.Text
-}
-
 type Root struct {
 	guigui.DefaultWidget
 
@@ -48,14 +43,13 @@ type Root struct {
 	minSymbolsTextField      basicwidget.TextField
 	resetButton              basicwidget.TextButton
 	generateButton           basicwidget.TextButton
-	passwordWidgets          []*PasswordWidgets
 	passwordsPanel           basicwidget.ScrollablePanel
 	passwordsPanelContent    passwordsPanelContent
 
 	passwords []Password
 }
 
-func (r *Root) Layout(context *guigui.Context, appender *guigui.ChildWidgetAppender) error {
+func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppender) error {
 	appender.AppendChildWidget(&r.background)
 
 	r.countOutputTextFieldText.SetText("count of output")
@@ -133,12 +127,6 @@ func (r *Root) Layout(context *guigui.Context, appender *guigui.ChildWidgetAppen
 	guigui.SetPosition(&r.passwordsPanel, guigui.Position(r).Add(image.Pt(0, int(8.5*u))))
 	appender.AppendChildWidget(&r.passwordsPanel)
 
-	r.passwordWidgets = slices.DeleteFunc(r.passwordWidgets, func(pw *PasswordWidgets) bool {
-		return !slices.ContainsFunc(r.passwords, func(p Password) bool {
-			return p.Text == pw.text.Text()
-		})
-	})
-
 	return nil
 }
 
@@ -175,13 +163,35 @@ func (r *Root) tryGeneratePassword() {
 	}
 }
 
+type passwordWidget struct {
+	guigui.DefaultWidget
+
+	copyButton basicwidget.TextButton
+	text       basicwidget.Text
+}
+
+func (p *passwordWidget) Build(context *guigui.Context, appender *guigui.ChildWidgetAppender) error {
+	u := float64(basicwidget.UnitSize(context))
+
+	pt := guigui.Position(p)
+	guigui.SetPosition(&p.copyButton, pt)
+	appender.AppendChildWidget(&p.copyButton)
+
+	w, _ := p.Size(context)
+	p.text.SetSize(w-int(4.5*u), int(u))
+	guigui.SetPosition(&p.text, image.Pt(pt.X+int(3.5*u), pt.Y))
+	appender.AppendChildWidget(&p.text)
+	return nil
+}
+
 type passwordsPanelContent struct {
 	guigui.DefaultWidget
 
-	root *Root
+	root            *Root
+	passwordWidgets []*passwordWidget
 }
 
-func (c *passwordsPanelContent) Layout(context *guigui.Context, appender *guigui.ChildWidgetAppender) error {
+func (c *passwordsPanelContent) Build(context *guigui.Context, appender *guigui.ChildWidgetAppender) error {
 	u := float64(basicwidget.UnitSize(context))
 
 	root := c.root
@@ -190,30 +200,37 @@ func (c *passwordsPanelContent) Layout(context *guigui.Context, appender *guigui
 	minX := p.X + int(0.5*u)
 	y := p.Y
 	for i, t := range root.passwords {
-		if has := slices.ContainsFunc(root.passwordWidgets, func(pw *PasswordWidgets) bool {
+		if has := slices.ContainsFunc(c.passwordWidgets, func(pw *passwordWidget) bool {
 			return pw.text.Text() == t.Text
 		}); !has {
-			var pw PasswordWidgets
+			var pw passwordWidget
 			pw.copyButton.SetText("Copy")
 			pw.copyButton.SetOnUp(func() {
 				clipboard.Write(clipboard.FmtText, []byte(t.Text))
 			})
 			pw.text.SetText(t.Text)
 			pw.text.SetVerticalAlign(basicwidget.VerticalAlignMiddle)
-			root.passwordWidgets = slices.Insert(root.passwordWidgets, i, &pw)
+			c.passwordWidgets = slices.Insert(c.passwordWidgets, i, &pw)
 		}
 
 		if i > 0 {
 			y += int(u / 4)
 		}
-		guigui.SetPosition(&root.passwordWidgets[i].copyButton, image.Pt(minX, y))
-		appender.AppendChildWidget(&root.passwordWidgets[i].copyButton)
+		guigui.SetPosition(&c.passwordWidgets[i].copyButton, image.Pt(minX, y))
+		appender.AppendChildWidget(&c.passwordWidgets[i].copyButton)
 
-		root.passwordWidgets[i].text.SetSize(w-int(4.5*u), int(u))
-		guigui.SetPosition(&root.passwordWidgets[i].text, image.Pt(minX+int(3.5*u), y))
-		appender.AppendChildWidget(&root.passwordWidgets[i].text)
+		c.passwordWidgets[i].text.SetSize(w-int(4.5*u), int(u))
+		guigui.SetPosition(&c.passwordWidgets[i].text, image.Pt(minX+int(3.5*u), y))
+		appender.AppendChildWidget(&c.passwordWidgets[i].text)
 		y += int(u)
 	}
+
+	c.passwordWidgets = slices.DeleteFunc(c.passwordWidgets, func(pw *passwordWidget) bool {
+		return !slices.ContainsFunc(c.root.passwords, func(p Password) bool {
+			return p.Text == pw.text.Text()
+		})
+	})
+
 	return nil
 }
 
