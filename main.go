@@ -122,7 +122,10 @@ func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppend
 	}
 
 	r.passwordsPanel.SetSize(context, w, h-int(8.5*u))
-	r.passwordsPanelContent.root = r
+	r.passwordsPanelContent.SetPasswords(r.passwords)
+	r.passwordsPanelContent.SetOnClearTriggered(func() {
+		r.passwords = []Password{}
+	})
 	r.passwordsPanel.SetContent(&r.passwordsPanelContent)
 	guigui.SetPosition(&r.passwordsPanel, guigui.Position(r).Add(image.Pt(0, int(8.5*u))))
 	appender.AppendChildWidget(&r.passwordsPanel)
@@ -136,7 +139,9 @@ func (r *Root) reset() {
 	r.minNumsTextField.SetText("-1")
 	r.minSymbolsTextField.SetText("-1")
 
-	r.passwords = []Password{}
+	if r.passwordsPanelContent.onClearTriggered != nil {
+		r.passwordsPanelContent.onClearTriggered()
+	}
 }
 
 func (r *Root) canGeneratePassword() bool {
@@ -157,7 +162,9 @@ func (r *Root) tryGeneratePassword() {
 	if err != nil {
 		return
 	}
-	r.passwords = []Password{}
+	if r.passwordsPanelContent.onClearTriggered != nil {
+		r.passwordsPanelContent.onClearTriggered()
+	}
 	for v := range bytes.FieldsSeq(buf.Bytes()) {
 		r.passwords = slices.Insert(r.passwords, len(r.passwords), NewPassword(string(v)))
 	}
@@ -170,15 +177,24 @@ type passwordWidget struct {
 	text       basicwidget.Text
 }
 
+func (p *passwordWidget) SetText(text string) {
+	p.text.SetText(text)
+}
+
 func (p *passwordWidget) Build(context *guigui.Context, appender *guigui.ChildWidgetAppender) error {
 	u := float64(basicwidget.UnitSize(context))
 
 	pt := guigui.Position(p)
+	p.copyButton.SetText("Copy")
+	p.copyButton.SetOnUp(func() {
+		clipboard.Write(clipboard.FmtText, []byte(p.text.Text()))
+	})
 	guigui.SetPosition(&p.copyButton, pt)
 	appender.AppendChildWidget(&p.copyButton)
 
 	w, _ := p.Size(context)
 	p.text.SetSize(w-int(4.5*u), int(u))
+	p.text.SetVerticalAlign(basicwidget.VerticalAlignMiddle)
 	guigui.SetPosition(&p.text, image.Pt(pt.X+int(3.5*u), pt.Y))
 	appender.AppendChildWidget(&p.text)
 	return nil
@@ -192,44 +208,42 @@ func (p *passwordWidget) Size(context *guigui.Context) (int, int) {
 type passwordsPanelContent struct {
 	guigui.DefaultWidget
 
-	root            *Root
-	passwordWidgets []*passwordWidget
+	passwordWidgets  []passwordWidget
+	onClearTriggered func()
 }
 
-func (c *passwordsPanelContent) Build(context *guigui.Context, appender *guigui.ChildWidgetAppender) error {
+func (p *passwordsPanelContent) SetOnClearTriggered(f func()) {
+	p.onClearTriggered = f
+}
+
+func (p *passwordsPanelContent) SetPasswords(passwords []Password) {
+	if len(passwords) != len(p.passwordWidgets) {
+		if len(passwords) > len(p.passwordWidgets) {
+			p.passwordWidgets = slices.Grow(p.passwordWidgets, len(passwords)-len(p.passwordWidgets))
+			p.passwordWidgets = p.passwordWidgets[:len(passwords)]
+		} else {
+			p.passwordWidgets = slices.Delete(p.passwordWidgets, len(passwords), len(p.passwordWidgets))
+		}
+	}
+	for i, pw := range passwords {
+		p.passwordWidgets[i].SetText(pw.Text)
+	}
+}
+
+func (p *passwordsPanelContent) Build(context *guigui.Context, appender *guigui.ChildWidgetAppender) error {
 	u := float64(basicwidget.UnitSize(context))
 
-	root := c.root
-	p := guigui.Position(c)
-	minX := p.X + int(0.5*u)
-	y := p.Y
-	for i, t := range root.passwords {
-		if has := slices.ContainsFunc(c.passwordWidgets, func(pw *passwordWidget) bool {
-			return pw.text.Text() == t.Text
-		}); !has {
-			var pw passwordWidget
-			pw.copyButton.SetText("Copy")
-			pw.copyButton.SetOnUp(func() {
-				clipboard.Write(clipboard.FmtText, []byte(t.Text))
-			})
-			pw.text.SetText(t.Text)
-			pw.text.SetVerticalAlign(basicwidget.VerticalAlignMiddle)
-			c.passwordWidgets = slices.Insert(c.passwordWidgets, i, &pw)
-		}
-
+	pt := guigui.Position(p)
+	x := pt.X + int(0.5*u)
+	y := pt.Y
+	for i := range p.passwordWidgets {
 		if i > 0 {
 			y += int(u / 4)
 		}
-		guigui.SetPosition(c.passwordWidgets[i], image.Pt(minX, y))
-		appender.AppendChildWidget(c.passwordWidgets[i])
+		guigui.SetPosition(&p.passwordWidgets[i], image.Pt(x, y))
+		appender.AppendChildWidget(&p.passwordWidgets[i])
 		y += int(u)
 	}
-
-	c.passwordWidgets = slices.DeleteFunc(c.passwordWidgets, func(pw *passwordWidget) bool {
-		return !slices.ContainsFunc(c.root.passwords, func(p Password) bool {
-			return p.Text == pw.text.Text()
-		})
-	})
 
 	return nil
 }
@@ -238,7 +252,7 @@ func (c *passwordsPanelContent) Size(context *guigui.Context) (int, int) {
 	u := basicwidget.UnitSize(context)
 
 	w, _ := guigui.Parent(c).Size(context)
-	cnt := len(c.root.passwords)
+	cnt := len(c.passwordWidgets)
 	h := cnt * (u + u/4)
 	return w, h
 }
