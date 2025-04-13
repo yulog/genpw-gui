@@ -91,8 +91,8 @@ func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppend
 	}
 
 	u := float64(basicwidget.UnitSize(context))
-	w, h := r.Size(context)
-	r.form.SetWidth(context, w-int(1*u))
+	w, h := guigui.Size(r)
+	guigui.SetSize(&r.form, w-int(1*u), guigui.AutoSize)
 	r.form.SetItems([]*basicwidget.FormItem{
 		{
 			PrimaryWidget:   &r.countOutputTextFieldText,
@@ -121,7 +121,7 @@ func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppend
 		appender.AppendChildWidget(&r.form)
 	}
 
-	r.passwordsPanel.SetSize(context, w, h-int(8.5*u))
+	guigui.SetSize(&r.passwordsPanel, w, h-int(8.5*u))
 	r.passwordsPanelContent.SetPasswords(r.passwords)
 	r.passwordsPanelContent.SetOnClearTriggered(func() {
 		r.passwords = []Password{}
@@ -192,16 +192,16 @@ func (p *passwordWidget) Build(context *guigui.Context, appender *guigui.ChildWi
 	guigui.SetPosition(&p.copyButton, pt)
 	appender.AppendChildWidget(&p.copyButton)
 
-	w, _ := p.Size(context)
-	p.text.SetSize(w-int(4.5*u), int(u))
+	w, _ := guigui.Size(p)
+	guigui.SetSize(&p.text, w-int(4.5*u), int(u))
 	p.text.SetVerticalAlign(basicwidget.VerticalAlignMiddle)
 	guigui.SetPosition(&p.text, image.Pt(pt.X+int(3.5*u), pt.Y))
 	appender.AppendChildWidget(&p.text)
 	return nil
 }
 
-func (p *passwordWidget) Size(context *guigui.Context) (int, int) {
-	w, _ := guigui.Parent(p).Size(context)
+func (p *passwordWidget) DefaultSize(context *guigui.Context) (int, int) {
+	w, _ := guigui.Size(guigui.Parent(p))
 	return w, int(basicwidget.UnitSize(context))
 }
 
@@ -248,10 +248,10 @@ func (p *passwordsPanelContent) Build(context *guigui.Context, appender *guigui.
 	return nil
 }
 
-func (c *passwordsPanelContent) Size(context *guigui.Context) (int, int) {
+func (c *passwordsPanelContent) DefaultSize(context *guigui.Context) (int, int) {
 	u := basicwidget.UnitSize(context)
 
-	w, _ := guigui.Parent(c).Size(context)
+	w, _ := guigui.Size(guigui.Parent(c))
 	cnt := len(c.passwordWidgets)
 	h := cnt * (u + u/4)
 	return w, h
