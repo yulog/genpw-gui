@@ -22,6 +22,8 @@ github.com/hajimehoshi/guigui v0.0.0-20250412164232-6d674e4fa85b h1:IFBCXJhINqea
 github.com/hajimehoshi/guigui v0.0.0-20250412164232-6d674e4fa85b/go.mod h1:tieMcd22paCmA+rzqNJ0XtrORgHrWKDlCVRqJ02mBCk=
 github.com/hajimehoshi/guigui v0.0.0-20250413084357-a81a75caa476 h1:7+sHvIBd0hc4wO9CZPpY/PJy9L5w4EKa4QdsESWi8es=
 github.com/hajimehoshi/guigui v0.0.0-20250413084357-a81a75caa476/go.mod h1:tieMcd22paCmA+rzqNJ0XtrORgHrWKDlCVRqJ02mBCk=
+github.com/hajimehoshi/guigui v0.0.0-20250414191442-e0301dba016e h1:H7tbv6mmi6Dc9Fc5RkPWeWYbHX9kwKyXm+8aZbUCXmw=
+github.com/hajimehoshi/guigui v0.0.0-20250414191442-e0301dba016e/go.mod h1:tieMcd22paCmA+rzqNJ0XtrORgHrWKDlCVRqJ02mBCk=
 github.com/hajimehoshi/oklab v0.0.0-20231202174141-83d68450b640 h1:XH+3N6OOGcqegLNj3l550IbN/2+Mu35fBKHYNWAQjJk=
 github.com/hajimehoshi/oklab v0.0.0-20231202174141-83d68450b640/go.mod h1:PQQ2H7nXuDlAr4pkdDRTfXp5tXdfIUKQpZbpZE7ugT4=
 github.com/jeandeaual/go-locale v0.0.0-20241217141322-fcc2cadd6f08 h1:wMeVzrPO3mfHIWLZtDcSaGAe2I4PW9B/P5nMkRSwCAc=
