@@ -2,7 +2,7 @@ module github.com/yulog/genpw-gui
 
 go 1.24.1
 
-require github.com/hajimehoshi/guigui v0.0.0-20250414191442-e0301dba016e
+require github.com/hajimehoshi/guigui v0.0.0-20250416040152-22bdb13c799f
 
 require (
 	github.com/hajimehoshi/ebiten/v2 v2.9.0-alpha.5.0.20250409182445-65714dc4c721 // indirect
