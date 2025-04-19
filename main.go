@@ -13,6 +13,7 @@ import (
 	"github.com/hajimehoshi/guigui"
 	"github.com/hajimehoshi/guigui/basicwidget"
 	_ "github.com/hajimehoshi/guigui/basicwidget/cjkfont"
+	"github.com/hajimehoshi/guigui/layout"
 	"golang.design/x/clipboard"
 )
 
@@ -90,8 +91,8 @@ func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppend
 		context.Disable(&r.generateButton)
 	}
 
-	u := float64(basicwidget.UnitSize(context))
-	context.SetSize(&r.form, image.Pt(context.Size(r).X-int(1*u), guigui.DefaultSize))
+	u := basicwidget.UnitSize(context)
+	// context.SetSize(&r.form, image.Pt(context.Size(r).X-int(1*u), guigui.DefaultSize))
 	r.form.SetItems([]*basicwidget.FormItem{
 		{
 			PrimaryWidget:   &r.countOutputTextFieldText,
@@ -115,18 +116,74 @@ func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppend
 		},
 	})
 	{
-		p := context.Position(r).Add(image.Pt(int(0.5*u), int(0.5*u)))
-		appender.AppendChildWidgetWithPosition(&r.form, p)
+		// p := context.Position(r).Add(image.Pt(int(0.5*u), int(0.5*u)))
+		// appender.AppendChildWidgetWithPosition(&r.form, p)
+		// for i, bounds := range (layout.GridLayout{
+		// 	Bounds: context.Bounds(r).Inset(u / 2),
+		// 	Heights: []layout.Size{
+		// 		layout.MaxContentSize(func(index int) int {
+		// 			if index >= 1 {
+		// 				return 0
+		// 			}
+		// 			return context.Size(&r.form).Y
+		// 		}),
+		// 	},
+		// 	RowGap: u / 2,
+		// }).RepeatingCellBounds() {
+		// 	if i >= 1 {
+		// 		break
+		// 	}
+		// 	appender.AppendChildWidgetWithBounds(&r.form, bounds)
+		// }
 	}
 
-	context.SetSize(&r.passwordsPanel, context.Size(r).Add(image.Pt(0, -int(8.5*u))))
+	// context.SetSize(&r.passwordsPanel, context.Size(r).Add(image.Pt(0, -int(8*u))))
 	r.passwordsPanelContent.SetPasswords(r.passwords)
 	r.passwordsPanelContent.SetOnClearTriggered(func() {
 		r.passwords = []Password{}
 	})
 	r.passwordsPanel.SetContent(&r.passwordsPanelContent)
-	context.SetSize(&r.passwordsPanelContent, image.Pt(context.Size(r).X, guigui.DefaultSize))
-	appender.AppendChildWidgetWithPosition(&r.passwordsPanel, context.Position(r).Add(image.Pt(0, int(8.5*u))))
+	// context.SetSize(&r.passwordsPanelContent, image.Pt(context.Size(r).X, guigui.DefaultSize))
+	// appender.AppendChildWidgetWithPosition(&r.passwordsPanel, context.Position(r).Add(image.Pt(0, int(8*u))))
+
+	for i, bounds := range (layout.GridLayout{
+		Bounds: context.Bounds(r).Inset(u / 2),
+		Heights: []layout.Size{
+			layout.MaxContentSize(func(index int) int {
+				if index >= 1 {
+					return 0
+				}
+				return context.Size(&r.form).Y
+			}),
+			layout.FlexibleSize(1),
+		},
+		RowGap: u / 2,
+	}).CellBounds() {
+		switch i {
+		case 0:
+			// for i, bounds := range (layout.GridLayout{
+			// 	Bounds: context.Bounds(r).Inset(u / 2),
+			// 	Heights: []layout.Size{
+			// 		layout.MaxContentSize(func(index int) int {
+			// 			if index >= 1 {
+			// 				return 0
+			// 			}
+			// 			return context.Size(&r.form).Y
+			// 		}),
+			// 	},
+			// 	RowGap: u / 2,
+			// }).RepeatingCellBounds() {
+			// 	if i >= 1 {
+			// 		break
+			// 	}
+			// 	appender.AppendChildWidgetWithBounds(&r.form, bounds)
+			// }
+			appender.AppendChildWidgetWithBounds(&r.form, bounds)
+		case 1:
+			context.SetSize(&r.passwordsPanelContent, image.Pt(bounds.Dx(), guigui.DefaultSize)) // Flexibleにならないため
+			appender.AppendChildWidgetWithBounds(&r.passwordsPanel, bounds)
+		}
+	}
 
 	return nil
 }
@@ -180,20 +237,36 @@ func (p *passwordWidget) SetText(text string) {
 }
 
 func (p *passwordWidget) Build(context *guigui.Context, appender *guigui.ChildWidgetAppender) error {
-	u := float64(basicwidget.UnitSize(context))
+	// u := basicwidget.UnitSize(context)
 
-	pt := context.Position(p)
+	// pt := context.Position(p)
 	p.copyButton.SetText("Copy")
 	p.copyButton.SetOnUp(func() {
 		clipboard.Write(clipboard.FmtText, []byte(p.text.Text()))
 	})
-	context.SetSize(&p.copyButton, image.Pt(int(3*u), guigui.DefaultSize))
-	appender.AppendChildWidgetWithPosition(&p.copyButton, pt)
+	// context.SetSize(&p.copyButton, image.Pt(int(3*u), guigui.DefaultSize))
+	// appender.AppendChildWidgetWithPosition(&p.copyButton, pt)
 
-	// w, h := context.Size(p)
-	context.SetSize(&p.text, context.Size(p).Add(image.Pt(-int(4.5*u), 0)))
+	// context.SetSize(&p.text, context.Size(p).Add(image.Pt(-int(4*u), 0)))
 	p.text.SetVerticalAlign(basicwidget.VerticalAlignMiddle)
-	appender.AppendChildWidgetWithPosition(&p.text, image.Pt(pt.X+int(3.5*u), pt.Y))
+	// appender.AppendChildWidgetWithPosition(&p.text, image.Pt(pt.X+int(3.5*u), pt.Y))
+
+	u := basicwidget.UnitSize(context)
+	for i, bounds := range (layout.GridLayout{
+		Bounds: context.Bounds(p),
+		Widths: []layout.Size{
+			layout.FixedSize(3 * u),
+			layout.FlexibleSize(1),
+		},
+		ColumnGap: u / 2,
+	}).CellBounds() {
+		switch i {
+		case 0:
+			appender.AppendChildWidgetWithBounds(&p.copyButton, bounds)
+		case 1:
+			appender.AppendChildWidgetWithBounds(&p.text, bounds)
+		}
+	}
 	return nil
 }
 
@@ -227,21 +300,38 @@ func (p *passwordsPanelContent) SetPasswords(passwords []Password) {
 }
 
 func (p *passwordsPanelContent) Build(context *guigui.Context, appender *guigui.ChildWidgetAppender) error {
-	u := float64(basicwidget.UnitSize(context))
+	u := basicwidget.UnitSize(context)
 
-	pt := context.Position(p)
-	x := pt.X + int(0.5*u)
-	y := pt.Y
-	for i := range p.passwordWidgets {
-		if i > 0 {
-			y += int(u / 4)
+	// pt := context.Position(p)
+	// x := pt.X + int(0.5*u)
+	// y := pt.Y
+	// for i := range p.passwordWidgets {
+	// 	if i > 0 {
+	// 		pt.Y += int(u / 4)
+	// 	}
+	// 	appender.AppendChildWidgetWithBounds(&p.passwordWidgets[i],
+	// 		image.Rectangle{
+	// 			Min: pt,
+	// 			Max: pt.Add(image.Pt(context.Size(p).X, int(u))),
+	// 		})
+	// 	pt.Y += int(u)
+	// }
+	for i, bounds := range (layout.GridLayout{
+		Bounds: context.Bounds(p),
+		Heights: []layout.Size{
+			layout.MaxContentSize(func(index int) int {
+				if index >= len(p.passwordWidgets) {
+					return 0
+				}
+				return context.Size(&p.passwordWidgets[index]).Y
+			}),
+		},
+		RowGap: u / 4,
+	}).RepeatingCellBounds() {
+		if i >= len(p.passwordWidgets) {
+			break
 		}
-		appender.AppendChildWidgetWithBounds(&p.passwordWidgets[i],
-			image.Rectangle{
-				Min: image.Pt(x, y),
-				Max: image.Pt(x, y).Add(image.Pt(context.Size(p).X, int(u))),
-			})
-		y += int(u)
+		appender.AppendChildWidgetWithBounds(&p.passwordWidgets[i], bounds)
 	}
 
 	return nil
