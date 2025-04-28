@@ -285,8 +285,8 @@ func main() {
 		os.Exit(1)
 	}
 	op := &guigui.RunOptions{
-		Title:      "Password Generator",
-		WindowSize: image.Pt(320, 240),
+		Title:         "Password Generator",
+		WindowMinSize: image.Pt(320, 240),
 	}
 	if err := guigui.Run(&Root{}, op); err != nil {
 		fmt.Fprintln(os.Stderr, err)
