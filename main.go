@@ -35,13 +35,13 @@ type Root struct {
 	background               basicwidget.Background
 	form                     basicwidget.Form
 	countOutputTextFieldText basicwidget.Text
-	countOutputTextField     basicwidget.TextField
+	countOutputTextField     basicwidget.TextInput
 	numberCharsTextFieldText basicwidget.Text
-	numberCharsTextField     basicwidget.TextField
+	numberCharsTextField     basicwidget.TextInput
 	minNumsTextFieldText     basicwidget.Text
-	minNumsTextField         basicwidget.TextField
+	minNumsTextField         basicwidget.TextInput
 	minSymbolsTextFieldText  basicwidget.Text
-	minSymbolsTextField      basicwidget.TextField
+	minSymbolsTextField      basicwidget.TextInput
 	resetButton              basicwidget.TextButton
 	generateButton           basicwidget.TextButton
 	passwordsPanel           basicwidget.ScrollablePanel
@@ -85,11 +85,7 @@ func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppend
 	r.generateButton.SetOnUp(func() {
 		r.tryGeneratePassword()
 	})
-	if r.canGeneratePassword() {
-		context.Enable(&r.generateButton)
-	} else {
-		context.Disable(&r.generateButton)
-	}
+	context.SetEnabled(&r.generateButton, r.canGeneratePassword())
 
 	u := basicwidget.UnitSize(context)
 	r.form.SetItems([]*basicwidget.FormItem{
@@ -289,9 +285,8 @@ func main() {
 		os.Exit(1)
 	}
 	op := &guigui.RunOptions{
-		Title:           "Password Generator",
-		WindowMinWidth:  320,
-		WindowMinHeight: 240,
+		Title:      "Password Generator",
+		WindowSize: image.Pt(320, 240),
 	}
 	if err := guigui.Run(&Root{}, op); err != nil {
 		fmt.Fprintln(os.Stderr, err)
