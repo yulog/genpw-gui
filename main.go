@@ -32,20 +32,20 @@ type Root struct {
 
 	once sync.Once
 
-	background               basicwidget.Background
-	form                     basicwidget.Form
-	countOutputTextFieldText basicwidget.Text
-	countOutputTextField     basicwidget.TextInput
-	numberCharsTextFieldText basicwidget.Text
-	numberCharsTextField     basicwidget.TextInput
-	minNumsTextFieldText     basicwidget.Text
-	minNumsTextField         basicwidget.TextInput
-	minSymbolsTextFieldText  basicwidget.Text
-	minSymbolsTextField      basicwidget.TextInput
-	resetButton              basicwidget.TextButton
-	generateButton           basicwidget.TextButton
-	passwordsPanel           basicwidget.ScrollablePanel
-	passwordsPanelContent    passwordsPanelContent
+	background            basicwidget.Background
+	form                  basicwidget.Form
+	countOutputText       basicwidget.Text
+	countOutputTextInput  basicwidget.TextInput
+	numberCharsText       basicwidget.Text
+	numberCharsTextInput  basicwidget.TextInput
+	minNumsText           basicwidget.Text
+	minNumsTextInput      basicwidget.TextInput
+	minSymbolsText        basicwidget.Text
+	minSymbolsTextInput   basicwidget.TextInput
+	resetButton           basicwidget.TextButton
+	generateButton        basicwidget.TextButton
+	passwordsPanel        basicwidget.ScrollablePanel
+	passwordsPanelContent passwordsPanelContent
 
 	passwords []Password
 }
@@ -53,24 +53,24 @@ type Root struct {
 func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppender) error {
 	appender.AppendChildWidgetWithBounds(&r.background, context.Bounds(r))
 
-	r.countOutputTextFieldText.SetText("count of output")
-	r.countOutputTextField.SetHorizontalAlign(basicwidget.HorizontalAlignEnd)
-	r.countOutputTextField.SetOnEnterPressed(func(text string) {
+	r.countOutputText.SetText("count of output")
+	r.countOutputTextInput.SetHorizontalAlign(basicwidget.HorizontalAlignEnd)
+	r.countOutputTextInput.SetOnEnterPressed(func(text string) {
 		r.tryGeneratePassword()
 	})
-	r.numberCharsTextFieldText.SetText("number of characters")
-	r.numberCharsTextField.SetHorizontalAlign(basicwidget.HorizontalAlignEnd)
-	r.numberCharsTextField.SetOnEnterPressed(func(text string) {
+	r.numberCharsText.SetText("number of characters")
+	r.numberCharsTextInput.SetHorizontalAlign(basicwidget.HorizontalAlignEnd)
+	r.numberCharsTextInput.SetOnEnterPressed(func(text string) {
 		r.tryGeneratePassword()
 	})
-	r.minNumsTextFieldText.SetText("minimum count of numbers")
-	r.minNumsTextField.SetHorizontalAlign(basicwidget.HorizontalAlignEnd)
-	r.minNumsTextField.SetOnEnterPressed(func(text string) {
+	r.minNumsText.SetText("minimum count of numbers")
+	r.minNumsTextInput.SetHorizontalAlign(basicwidget.HorizontalAlignEnd)
+	r.minNumsTextInput.SetOnEnterPressed(func(text string) {
 		r.tryGeneratePassword()
 	})
-	r.minSymbolsTextFieldText.SetText("minimum count of symbols")
-	r.minSymbolsTextField.SetHorizontalAlign(basicwidget.HorizontalAlignEnd)
-	r.minSymbolsTextField.SetOnEnterPressed(func(text string) {
+	r.minSymbolsText.SetText("minimum count of symbols")
+	r.minSymbolsTextInput.SetHorizontalAlign(basicwidget.HorizontalAlignEnd)
+	r.minSymbolsTextInput.SetOnEnterPressed(func(text string) {
 		r.tryGeneratePassword()
 	})
 
@@ -90,20 +90,20 @@ func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppend
 	u := basicwidget.UnitSize(context)
 	r.form.SetItems([]*basicwidget.FormItem{
 		{
-			PrimaryWidget:   &r.countOutputTextFieldText,
-			SecondaryWidget: &r.countOutputTextField,
+			PrimaryWidget:   &r.countOutputText,
+			SecondaryWidget: &r.countOutputTextInput,
 		},
 		{
-			PrimaryWidget:   &r.numberCharsTextFieldText,
-			SecondaryWidget: &r.numberCharsTextField,
+			PrimaryWidget:   &r.numberCharsText,
+			SecondaryWidget: &r.numberCharsTextInput,
 		},
 		{
-			PrimaryWidget:   &r.minNumsTextFieldText,
-			SecondaryWidget: &r.minNumsTextField,
+			PrimaryWidget:   &r.minNumsText,
+			SecondaryWidget: &r.minNumsTextInput,
 		},
 		{
-			PrimaryWidget:   &r.minSymbolsTextFieldText,
-			SecondaryWidget: &r.minSymbolsTextField,
+			PrimaryWidget:   &r.minSymbolsText,
+			SecondaryWidget: &r.minSymbolsTextInput,
 		},
 		{
 			PrimaryWidget:   &r.resetButton,
@@ -143,10 +143,10 @@ func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppend
 }
 
 func (r *Root) reset() {
-	r.countOutputTextField.SetText("64")
-	r.numberCharsTextField.SetText("16")
-	r.minNumsTextField.SetText("-1")
-	r.minSymbolsTextField.SetText("-1")
+	r.countOutputTextInput.SetText("64")
+	r.numberCharsTextInput.SetText("16")
+	r.minNumsTextInput.SetText("-1")
+	r.minSymbolsTextInput.SetText("-1")
 
 	if r.passwordsPanelContent.onClearTriggered != nil {
 		r.passwordsPanelContent.onClearTriggered()
@@ -154,18 +154,18 @@ func (r *Root) reset() {
 }
 
 func (r *Root) canGeneratePassword() bool {
-	o := strings.TrimSpace(r.countOutputTextField.Text())
-	n := strings.TrimSpace(r.numberCharsTextField.Text())
-	nc := strings.TrimSpace(r.minNumsTextField.Text())
-	sc := strings.TrimSpace(r.minSymbolsTextField.Text())
+	o := strings.TrimSpace(r.countOutputTextInput.Text())
+	n := strings.TrimSpace(r.numberCharsTextInput.Text())
+	nc := strings.TrimSpace(r.minNumsTextInput.Text())
+	sc := strings.TrimSpace(r.minSymbolsTextInput.Text())
 	return o != "" && n != "" && nc != "" && sc != ""
 }
 
 func (r *Root) tryGeneratePassword() {
-	o, _ := strconv.Atoi(strings.TrimSpace(r.countOutputTextField.Text()))
-	n, _ := strconv.Atoi(strings.TrimSpace(r.numberCharsTextField.Text()))
-	nc, _ := strconv.Atoi(strings.TrimSpace(r.minNumsTextField.Text()))
-	sc, _ := strconv.Atoi(strings.TrimSpace(r.minSymbolsTextField.Text()))
+	o, _ := strconv.Atoi(strings.TrimSpace(r.countOutputTextInput.Text()))
+	n, _ := strconv.Atoi(strings.TrimSpace(r.numberCharsTextInput.Text()))
+	nc, _ := strconv.Atoi(strings.TrimSpace(r.minNumsTextInput.Text()))
+	sc, _ := strconv.Atoi(strings.TrimSpace(r.minSymbolsTextInput.Text()))
 	var buf bytes.Buffer
 	err := run(&buf, o, n, nc, sc)
 	if err != nil {
