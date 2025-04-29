@@ -17,16 +17,6 @@ import (
 	"golang.design/x/clipboard"
 )
 
-type Password struct {
-	Text string
-}
-
-func NewPassword(text string) Password {
-	return Password{
-		Text: text,
-	}
-}
-
 type Root struct {
 	guigui.RootWidget
 
@@ -47,7 +37,7 @@ type Root struct {
 	passwordsPanel        basicwidget.ScrollablePanel
 	passwordsPanelContent passwordsPanelContent
 
-	passwords []Password
+	model Model
 }
 
 func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppender) error {
@@ -85,7 +75,13 @@ func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppend
 	r.generateButton.SetOnUp(func() {
 		r.tryGeneratePassword()
 	})
-	context.SetEnabled(&r.generateButton, r.canGeneratePassword())
+	context.SetEnabled(&r.generateButton,
+		r.model.CanGeneratePassword(
+			r.countOutputTextInput.Text(),
+			r.numberCharsTextInput.Text(),
+			r.minNumsTextInput.Text(),
+			r.minSymbolsTextInput.Text(),
+		))
 
 	u := basicwidget.UnitSize(context)
 	r.form.SetItems([]*basicwidget.FormItem{
@@ -111,9 +107,9 @@ func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppend
 		},
 	})
 
-	r.passwordsPanelContent.SetPasswords(r.passwords)
+	r.passwordsPanelContent.SetModel(&r.model)
 	r.passwordsPanelContent.SetOnClearTriggered(func() {
-		r.passwords = []Password{}
+		r.model.ClearPassword()
 	})
 	r.passwordsPanel.SetContent(&r.passwordsPanelContent)
 
@@ -153,14 +149,6 @@ func (r *Root) reset() {
 	}
 }
 
-func (r *Root) canGeneratePassword() bool {
-	o := strings.TrimSpace(r.countOutputTextInput.Text())
-	n := strings.TrimSpace(r.numberCharsTextInput.Text())
-	nc := strings.TrimSpace(r.minNumsTextInput.Text())
-	sc := strings.TrimSpace(r.minSymbolsTextInput.Text())
-	return o != "" && n != "" && nc != "" && sc != ""
-}
-
 func (r *Root) tryGeneratePassword() {
 	o, _ := strconv.Atoi(strings.TrimSpace(r.countOutputTextInput.Text()))
 	n, _ := strconv.Atoi(strings.TrimSpace(r.numberCharsTextInput.Text()))
@@ -174,9 +162,7 @@ func (r *Root) tryGeneratePassword() {
 	if r.passwordsPanelContent.onClearTriggered != nil {
 		r.passwordsPanelContent.onClearTriggered()
 	}
-	for v := range bytes.FieldsSeq(buf.Bytes()) {
-		r.passwords = slices.Insert(r.passwords, len(r.passwords), NewPassword(string(v)))
-	}
+	r.model.TryAddPassword(&buf)
 }
 
 type passwordWidget struct {
@@ -225,27 +211,31 @@ type passwordsPanelContent struct {
 
 	passwordWidgets  []passwordWidget
 	onClearTriggered func()
+
+	model *Model
 }
 
 func (p *passwordsPanelContent) SetOnClearTriggered(f func()) {
 	p.onClearTriggered = f
 }
 
-func (p *passwordsPanelContent) SetPasswords(passwords []Password) {
-	if len(passwords) != len(p.passwordWidgets) {
-		if len(passwords) > len(p.passwordWidgets) {
-			p.passwordWidgets = slices.Grow(p.passwordWidgets, len(passwords)-len(p.passwordWidgets))
-			p.passwordWidgets = p.passwordWidgets[:len(passwords)]
-		} else {
-			p.passwordWidgets = slices.Delete(p.passwordWidgets, len(passwords), len(p.passwordWidgets))
-		}
-	}
-	for i, pw := range passwords {
-		p.passwordWidgets[i].SetText(pw.Text)
-	}
+func (p *passwordsPanelContent) SetModel(model *Model) {
+	p.model = model
 }
 
 func (p *passwordsPanelContent) Build(context *guigui.Context, appender *guigui.ChildWidgetAppender) error {
+	if p.model.PasswordCount() > len(p.passwordWidgets) {
+		p.passwordWidgets = slices.Grow(p.passwordWidgets, p.model.PasswordCount()-len(p.passwordWidgets))
+		p.passwordWidgets = p.passwordWidgets[:p.model.PasswordCount()]
+	} else {
+		p.passwordWidgets = slices.Delete(p.passwordWidgets, p.model.PasswordCount(), len(p.passwordWidgets))
+	}
+
+	for i := range p.model.PasswordCount() {
+		pw := p.model.PasswordByIndex(i)
+		p.passwordWidgets[i].SetText(pw.Text)
+	}
+
 	u := basicwidget.UnitSize(context)
 
 	for i, bounds := range (layout.GridLayout{
