@@ -6,8 +6,6 @@ import (
 	"image"
 	"os"
 	"slices"
-	"strconv"
-	"strings"
 	"sync"
 
 	"github.com/hajimehoshi/guigui"
@@ -22,20 +20,20 @@ type Root struct {
 
 	once sync.Once
 
-	background            basicwidget.Background
-	form                  basicwidget.Form
-	countOutputText       basicwidget.Text
-	countOutputTextInput  basicwidget.TextInput
-	numberCharsText       basicwidget.Text
-	numberCharsTextInput  basicwidget.TextInput
-	minNumsText           basicwidget.Text
-	minNumsTextInput      basicwidget.TextInput
-	minSymbolsText        basicwidget.Text
-	minSymbolsTextInput   basicwidget.TextInput
-	resetButton           basicwidget.TextButton
-	generateButton        basicwidget.TextButton
-	passwordsPanel        basicwidget.ScrollablePanel
-	passwordsPanelContent passwordsPanelContent
+	background             basicwidget.Background
+	form                   basicwidget.Form
+	countOutputText        basicwidget.Text
+	countOutputNumberInput basicwidget.NumberInput
+	numberCharsText        basicwidget.Text
+	numberCharsNumberInput basicwidget.NumberInput
+	minNumsText            basicwidget.Text
+	minNumsNumberInput     basicwidget.NumberInput
+	minSymbolsText         basicwidget.Text
+	minSymbolsNumberInput  basicwidget.NumberInput
+	resetButton            basicwidget.TextButton
+	generateButton         basicwidget.TextButton
+	passwordsPanel         basicwidget.ScrollablePanel
+	passwordsPanelContent  passwordsPanelContent
 
 	model Model
 }
@@ -44,25 +42,32 @@ func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppend
 	appender.AppendChildWidgetWithBounds(&r.background, context.Bounds(r))
 
 	r.countOutputText.SetText("count of output")
-	r.countOutputTextInput.SetHorizontalAlign(basicwidget.HorizontalAlignEnd)
-	r.countOutputTextInput.SetOnEnterPressed(func(text string) {
-		r.tryGeneratePassword()
+	r.countOutputNumberInput.SetOnValueChanged(func(value int64) {
+		r.model.SetCountOutputValue(value)
 	})
+	r.countOutputNumberInput.SetMinimumValue(1)
+	r.countOutputNumberInput.SetValue(r.model.CountOutputValue())
+
 	r.numberCharsText.SetText("number of characters")
-	r.numberCharsTextInput.SetHorizontalAlign(basicwidget.HorizontalAlignEnd)
-	r.numberCharsTextInput.SetOnEnterPressed(func(text string) {
-		r.tryGeneratePassword()
+	r.numberCharsNumberInput.SetOnValueChanged(func(value int64) {
+		r.model.SetNumberCharsValue(value)
 	})
+	r.numberCharsNumberInput.SetMinimumValue(1)
+	r.numberCharsNumberInput.SetValue(r.model.NumberCharsValue())
+
 	r.minNumsText.SetText("minimum count of numbers")
-	r.minNumsTextInput.SetHorizontalAlign(basicwidget.HorizontalAlignEnd)
-	r.minNumsTextInput.SetOnEnterPressed(func(text string) {
-		r.tryGeneratePassword()
+	r.minNumsNumberInput.SetOnValueChanged(func(value int64) {
+		r.model.SetMinNumsValue(value)
 	})
+	r.minNumsNumberInput.SetMinimumValue(-1)
+	r.minNumsNumberInput.SetValue(r.model.MinNumsValue())
+
 	r.minSymbolsText.SetText("minimum count of symbols")
-	r.minSymbolsTextInput.SetHorizontalAlign(basicwidget.HorizontalAlignEnd)
-	r.minSymbolsTextInput.SetOnEnterPressed(func(text string) {
-		r.tryGeneratePassword()
+	r.minSymbolsNumberInput.SetOnValueChanged(func(value int64) {
+		r.model.SetMinSymbolsValue(value)
 	})
+	r.minSymbolsNumberInput.SetMinimumValue(-1)
+	r.minSymbolsNumberInput.SetValue(r.model.MinSymbolsValue())
 
 	r.once.Do(func() { r.reset() })
 
@@ -75,31 +80,24 @@ func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppend
 	r.generateButton.SetOnUp(func() {
 		r.tryGeneratePassword()
 	})
-	context.SetEnabled(&r.generateButton,
-		r.model.CanGeneratePassword(
-			r.countOutputTextInput.Text(),
-			r.numberCharsTextInput.Text(),
-			r.minNumsTextInput.Text(),
-			r.minSymbolsTextInput.Text(),
-		))
 
 	u := basicwidget.UnitSize(context)
 	r.form.SetItems([]*basicwidget.FormItem{
 		{
 			PrimaryWidget:   &r.countOutputText,
-			SecondaryWidget: &r.countOutputTextInput,
+			SecondaryWidget: &r.countOutputNumberInput,
 		},
 		{
 			PrimaryWidget:   &r.numberCharsText,
-			SecondaryWidget: &r.numberCharsTextInput,
+			SecondaryWidget: &r.numberCharsNumberInput,
 		},
 		{
 			PrimaryWidget:   &r.minNumsText,
-			SecondaryWidget: &r.minNumsTextInput,
+			SecondaryWidget: &r.minNumsNumberInput,
 		},
 		{
 			PrimaryWidget:   &r.minSymbolsText,
-			SecondaryWidget: &r.minSymbolsTextInput,
+			SecondaryWidget: &r.minSymbolsNumberInput,
 		},
 		{
 			PrimaryWidget:   &r.resetButton,
@@ -139,10 +137,10 @@ func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppend
 }
 
 func (r *Root) reset() {
-	r.countOutputTextInput.SetText("64")
-	r.numberCharsTextInput.SetText("16")
-	r.minNumsTextInput.SetText("-1")
-	r.minSymbolsTextInput.SetText("-1")
+	r.countOutputNumberInput.SetValue(64)
+	r.numberCharsNumberInput.SetValue(16)
+	r.minNumsNumberInput.SetValue(-1)
+	r.minSymbolsNumberInput.SetValue(-1)
 
 	if r.passwordsPanelContent.onClearTriggered != nil {
 		r.passwordsPanelContent.onClearTriggered()
@@ -150,10 +148,11 @@ func (r *Root) reset() {
 }
 
 func (r *Root) tryGeneratePassword() {
-	o, _ := strconv.Atoi(strings.TrimSpace(r.countOutputTextInput.Text()))
-	n, _ := strconv.Atoi(strings.TrimSpace(r.numberCharsTextInput.Text()))
-	nc, _ := strconv.Atoi(strings.TrimSpace(r.minNumsTextInput.Text()))
-	sc, _ := strconv.Atoi(strings.TrimSpace(r.minSymbolsTextInput.Text()))
+	// TODO: この辺、modelに移す？
+	o := int(r.model.CountOutputValue())
+	n := int(r.model.NumberCharsValue())
+	nc := int(r.model.MinNumsValue())
+	sc := int(r.model.MinSymbolsValue())
 	var buf bytes.Buffer
 	err := run(&buf, o, n, nc, sc)
 	if err != nil {

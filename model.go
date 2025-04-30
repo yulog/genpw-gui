@@ -3,18 +3,47 @@ package main
 import (
 	"bytes"
 	"slices"
-	"strings"
 )
 
 type Model struct {
+	countOutput int64
+	numberChars int64
+	minNums     int64
+	minSymbols  int64
+
 	passwords []Password
 }
 
-func (m *Model) CanGeneratePassword(o, n, nc, sc string) bool {
-	return strings.TrimSpace(o) != "" &&
-		strings.TrimSpace(n) != "" &&
-		strings.TrimSpace(nc) != "" &&
-		strings.TrimSpace(sc) != ""
+func (m *Model) CountOutputValue() int64 {
+	return m.countOutput
+}
+
+func (m *Model) SetCountOutputValue(value int64) {
+	m.countOutput = value
+}
+
+func (m *Model) NumberCharsValue() int64 {
+	return m.numberChars
+}
+
+func (m *Model) SetNumberCharsValue(value int64) {
+	m.numberChars = value
+}
+
+func (m *Model) MinNumsValue() int64 {
+	return m.minNums
+}
+
+func (m *Model) SetMinNumsValue(value int64) {
+	m.minNums = value
+}
+
+func (m *Model) MinSymbolsValue() int64 {
+	return m.minSymbols
+}
+
+func (m *Model) SetMinSymbolsValue(value int64) {
+	m.minSymbols = value
 }
 
 func (m *Model) TryAddPassword(buf *bytes.Buffer) bool {
