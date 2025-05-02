@@ -111,19 +111,20 @@ func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppend
 	})
 	r.passwordsPanel.SetContent(&r.passwordsPanelContent)
 
-	for i, bounds := range (layout.GridLayout{
+	gl := layout.GridLayout{
 		Bounds: context.Bounds(r).Inset(u / 2),
 		Heights: []layout.Size{
-			layout.MaxContentSize(func(index int) int {
-				if index >= 1 {
-					return 0
+			layout.LazySize(func(row int) layout.Size {
+				if row >= 1 {
+					return layout.FixedSize(0)
 				}
-				return context.Size(&r.form).Y
+				return layout.FixedSize(context.Size(&r.form).Y)
 			}),
 			layout.FlexibleSize(1),
 		},
 		RowGap: u / 2,
-	}).CellBounds() {
+	}
+	for i, bounds := range gl.CellBounds() {
 		switch i {
 		case 0:
 			appender.AppendChildWidgetWithBounds(&r.form, bounds)
@@ -183,14 +184,15 @@ func (p *passwordWidget) Build(context *guigui.Context, appender *guigui.ChildWi
 	p.text.SetVerticalAlign(basicwidget.VerticalAlignMiddle)
 
 	u := basicwidget.UnitSize(context)
-	for i, bounds := range (layout.GridLayout{
+	gl := layout.GridLayout{
 		Bounds: context.Bounds(p),
 		Widths: []layout.Size{
 			layout.FixedSize(3 * u),
 			layout.FlexibleSize(1),
 		},
 		ColumnGap: u / 2,
-	}).CellBounds() {
+	}
+	for i, bounds := range gl.CellBounds() {
 		switch i {
 		case 0:
 			appender.AppendChildWidgetWithBounds(&p.copyButton, bounds)
@@ -236,19 +238,19 @@ func (p *passwordsPanelContent) Build(context *guigui.Context, appender *guigui.
 	}
 
 	u := basicwidget.UnitSize(context)
-
-	for i, bounds := range (layout.GridLayout{
+	gl := layout.GridLayout{
 		Bounds: context.Bounds(p),
 		Heights: []layout.Size{
-			layout.MaxContentSize(func(index int) int {
-				if index >= len(p.passwordWidgets) {
-					return 0
+			layout.LazySize(func(row int) layout.Size {
+				if row >= len(p.passwordWidgets) {
+					return layout.FixedSize(0)
 				}
-				return context.Size(&p.passwordWidgets[index]).Y
+				return layout.FixedSize(context.Size(&p.passwordWidgets[row]).Y)
 			}),
 		},
 		RowGap: u / 4,
-	}).RepeatingCellBounds() {
+	}
+	for i, bounds := range gl.RepeatingCellBounds() {
 		if i >= len(p.passwordWidgets) {
 			break
 		}
