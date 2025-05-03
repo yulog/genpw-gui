@@ -23,13 +23,13 @@ type Root struct {
 	background             basicwidget.Background
 	form                   basicwidget.Form
 	countOutputText        basicwidget.Text
-	countOutputNumberInput basicwidget.NumberInput
+	countOutputNumberInput basicwidget.NumberInput[int]
 	numberCharsText        basicwidget.Text
-	numberCharsNumberInput basicwidget.NumberInput
+	numberCharsNumberInput basicwidget.NumberInput[int]
 	minNumsText            basicwidget.Text
-	minNumsNumberInput     basicwidget.NumberInput
+	minNumsNumberInput     basicwidget.NumberInput[int]
 	minSymbolsText         basicwidget.Text
-	minSymbolsNumberInput  basicwidget.NumberInput
+	minSymbolsNumberInput  basicwidget.NumberInput[int]
 	resetButton            basicwidget.TextButton
 	generateButton         basicwidget.TextButton
 	passwordsPanel         basicwidget.ScrollablePanel
@@ -42,28 +42,28 @@ func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppend
 	appender.AppendChildWidgetWithBounds(&r.background, context.Bounds(r))
 
 	r.countOutputText.SetText("count of output")
-	r.countOutputNumberInput.SetOnValueChanged(func(value int64) {
+	r.countOutputNumberInput.SetOnValueChanged(func(value int) {
 		r.model.SetCountOutputValue(value)
 	})
 	r.countOutputNumberInput.SetMinimumValue(1)
 	r.countOutputNumberInput.SetValue(r.model.CountOutputValue())
 
 	r.numberCharsText.SetText("number of characters")
-	r.numberCharsNumberInput.SetOnValueChanged(func(value int64) {
+	r.numberCharsNumberInput.SetOnValueChanged(func(value int) {
 		r.model.SetNumberCharsValue(value)
 	})
 	r.numberCharsNumberInput.SetMinimumValue(1)
 	r.numberCharsNumberInput.SetValue(r.model.NumberCharsValue())
 
 	r.minNumsText.SetText("minimum count of numbers")
-	r.minNumsNumberInput.SetOnValueChanged(func(value int64) {
+	r.minNumsNumberInput.SetOnValueChanged(func(value int) {
 		r.model.SetMinNumsValue(value)
 	})
 	r.minNumsNumberInput.SetMinimumValue(-1)
 	r.minNumsNumberInput.SetValue(r.model.MinNumsValue())
 
 	r.minSymbolsText.SetText("minimum count of symbols")
-	r.minSymbolsNumberInput.SetOnValueChanged(func(value int64) {
+	r.minSymbolsNumberInput.SetOnValueChanged(func(value int) {
 		r.model.SetMinSymbolsValue(value)
 	})
 	r.minSymbolsNumberInput.SetMinimumValue(-1)
@@ -124,14 +124,11 @@ func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppend
 		},
 		RowGap: u / 2,
 	}
-	for i, bounds := range gl.CellBounds() {
-		switch i {
-		case 0:
-			appender.AppendChildWidgetWithBounds(&r.form, bounds)
-		case 1:
-			context.SetSize(&r.passwordsPanelContent, image.Pt(bounds.Dx(), guigui.DefaultSize)) // Flexibleにならないため
-			appender.AppendChildWidgetWithBounds(&r.passwordsPanel, bounds)
-		}
+	appender.AppendChildWidgetWithBounds(&r.form, gl.CellBounds(0, 0))
+	{
+		bounds := gl.CellBounds(0, 1)
+		context.SetSize(&r.passwordsPanelContent, image.Pt(bounds.Dx(), guigui.DefaultSize)) // Flexibleにならないため
+		appender.AppendChildWidgetWithBounds(&r.passwordsPanel, bounds)
 	}
 
 	return nil
@@ -150,10 +147,10 @@ func (r *Root) reset() {
 
 func (r *Root) tryGeneratePassword() {
 	// TODO: この辺、modelに移す？
-	o := int(r.model.CountOutputValue())
-	n := int(r.model.NumberCharsValue())
-	nc := int(r.model.MinNumsValue())
-	sc := int(r.model.MinSymbolsValue())
+	o := r.model.CountOutputValue()
+	n := r.model.NumberCharsValue()
+	nc := r.model.MinNumsValue()
+	sc := r.model.MinSymbolsValue()
 	var buf bytes.Buffer
 	err := run(&buf, o, n, nc, sc)
 	if err != nil {
@@ -192,14 +189,9 @@ func (p *passwordWidget) Build(context *guigui.Context, appender *guigui.ChildWi
 		},
 		ColumnGap: u / 2,
 	}
-	for i, bounds := range gl.CellBounds() {
-		switch i {
-		case 0:
-			appender.AppendChildWidgetWithBounds(&p.copyButton, bounds)
-		case 1:
-			appender.AppendChildWidgetWithBounds(&p.text, bounds)
-		}
-	}
+	appender.AppendChildWidgetWithBounds(&p.copyButton, gl.CellBounds(0, 0))
+	appender.AppendChildWidgetWithBounds(&p.text, gl.CellBounds(1, 0))
+
 	return nil
 }
 
@@ -250,10 +242,8 @@ func (p *passwordsPanelContent) Build(context *guigui.Context, appender *guigui.
 		},
 		RowGap: u / 4,
 	}
-	for i, bounds := range gl.RepeatingCellBounds() {
-		if i >= len(p.passwordWidgets) {
-			break
-		}
+	for i := range p.passwordWidgets {
+		bounds := gl.CellBounds(0, i)
 		appender.AppendChildWidgetWithBounds(&p.passwordWidgets[i], bounds)
 	}
 

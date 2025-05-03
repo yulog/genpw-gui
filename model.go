@@ -6,43 +6,43 @@ import (
 )
 
 type Model struct {
-	countOutput int64
-	numberChars int64
-	minNums     int64
-	minSymbols  int64
+	countOutput int
+	numberChars int
+	minNums     int
+	minSymbols  int
 
 	passwords []Password
 }
 
-func (m *Model) CountOutputValue() int64 {
+func (m *Model) CountOutputValue() int {
 	return m.countOutput
 }
 
-func (m *Model) SetCountOutputValue(value int64) {
+func (m *Model) SetCountOutputValue(value int) {
 	m.countOutput = value
 }
 
-func (m *Model) NumberCharsValue() int64 {
+func (m *Model) NumberCharsValue() int {
 	return m.numberChars
 }
 
-func (m *Model) SetNumberCharsValue(value int64) {
+func (m *Model) SetNumberCharsValue(value int) {
 	m.numberChars = value
 }
 
-func (m *Model) MinNumsValue() int64 {
+func (m *Model) MinNumsValue() int {
 	return m.minNums
 }
 
-func (m *Model) SetMinNumsValue(value int64) {
+func (m *Model) SetMinNumsValue(value int) {
 	m.minNums = value
 }
 
-func (m *Model) MinSymbolsValue() int64 {
+func (m *Model) MinSymbolsValue() int {
 	return m.minSymbols
 }
 
-func (m *Model) SetMinSymbolsValue(value int64) {
+func (m *Model) SetMinSymbolsValue(value int) {
 	m.minSymbols = value
 }
 
