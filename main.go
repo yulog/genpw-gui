@@ -8,6 +8,7 @@ import (
 	"slices"
 	"sync"
 
+	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/guigui"
 	"github.com/hajimehoshi/guigui/basicwidget"
 	_ "github.com/hajimehoshi/guigui/basicwidget/cjkfont"
@@ -16,23 +17,23 @@ import (
 )
 
 type Root struct {
-	guigui.RootWidget
+	guigui.DefaultWidget
 
 	once sync.Once
 
 	background             basicwidget.Background
 	form                   basicwidget.Form
 	countOutputText        basicwidget.Text
-	countOutputNumberInput basicwidget.NumberInput[int]
+	countOutputNumberInput basicwidget.NumberInput
 	numberCharsText        basicwidget.Text
-	numberCharsNumberInput basicwidget.NumberInput[int]
+	numberCharsNumberInput basicwidget.NumberInput
 	minNumsText            basicwidget.Text
-	minNumsNumberInput     basicwidget.NumberInput[int]
+	minNumsNumberInput     basicwidget.NumberInput
 	minSymbolsText         basicwidget.Text
-	minSymbolsNumberInput  basicwidget.NumberInput[int]
-	resetButton            basicwidget.TextButton
-	generateButton         basicwidget.TextButton
-	passwordsPanel         basicwidget.ScrollablePanel
+	minSymbolsNumberInput  basicwidget.NumberInput
+	resetButton            basicwidget.Button
+	generateButton         basicwidget.Button
+	passwordsPanel         basicwidget.Panel
 	passwordsPanelContent  passwordsPanelContent
 
 	model Model
@@ -41,33 +42,33 @@ type Root struct {
 func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppender) error {
 	appender.AppendChildWidgetWithBounds(&r.background, context.Bounds(r))
 
-	r.countOutputText.SetText("count of output")
-	r.countOutputNumberInput.SetOnValueChanged(func(value int) {
-		r.model.SetCountOutputValue(value)
+	r.countOutputText.SetValue("count of output")
+	r.countOutputNumberInput.SetOnValueChangedInt64(func(value int64) {
+		r.model.SetCountOutputValue(int(value))
 	})
-	r.countOutputNumberInput.SetMinimumValue(1)
-	r.countOutputNumberInput.SetValue(r.model.CountOutputValue())
+	r.countOutputNumberInput.SetMinimumValueInt64(1)
+	r.countOutputNumberInput.SetValueInt64(int64(r.model.CountOutputValue()))
 
-	r.numberCharsText.SetText("number of characters")
-	r.numberCharsNumberInput.SetOnValueChanged(func(value int) {
-		r.model.SetNumberCharsValue(value)
+	r.numberCharsText.SetValue("number of characters")
+	r.numberCharsNumberInput.SetOnValueChangedInt64(func(value int64) {
+		r.model.SetNumberCharsValue(int(value))
 	})
-	r.numberCharsNumberInput.SetMinimumValue(1)
-	r.numberCharsNumberInput.SetValue(r.model.NumberCharsValue())
+	r.numberCharsNumberInput.SetMinimumValueInt64(1)
+	r.numberCharsNumberInput.SetValueInt64(int64(r.model.NumberCharsValue()))
 
-	r.minNumsText.SetText("minimum count of numbers")
-	r.minNumsNumberInput.SetOnValueChanged(func(value int) {
-		r.model.SetMinNumsValue(value)
+	r.minNumsText.SetValue("minimum count of numbers")
+	r.minNumsNumberInput.SetOnValueChangedInt64(func(value int64) {
+		r.model.SetMinNumsValue(int(value))
 	})
-	r.minNumsNumberInput.SetMinimumValue(-1)
-	r.minNumsNumberInput.SetValue(r.model.MinNumsValue())
+	r.minNumsNumberInput.SetMinimumValueInt64(-1)
+	r.minNumsNumberInput.SetValueInt64(int64(r.model.MinNumsValue()))
 
-	r.minSymbolsText.SetText("minimum count of symbols")
-	r.minSymbolsNumberInput.SetOnValueChanged(func(value int) {
-		r.model.SetMinSymbolsValue(value)
+	r.minSymbolsText.SetValue("minimum count of symbols")
+	r.minSymbolsNumberInput.SetOnValueChangedInt64(func(value int64) {
+		r.model.SetMinSymbolsValue(int(value))
 	})
-	r.minSymbolsNumberInput.SetMinimumValue(-1)
-	r.minSymbolsNumberInput.SetValue(r.model.MinSymbolsValue())
+	r.minSymbolsNumberInput.SetMinimumValueInt64(-1)
+	r.minSymbolsNumberInput.SetValueInt64(int64(r.model.MinSymbolsValue()))
 
 	r.once.Do(func() { r.reset() })
 
@@ -82,7 +83,7 @@ func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppend
 	})
 
 	u := basicwidget.UnitSize(context)
-	r.form.SetItems([]*basicwidget.FormItem{
+	r.form.SetItems([]basicwidget.FormItem{
 		{
 			PrimaryWidget:   &r.countOutputText,
 			SecondaryWidget: &r.countOutputNumberInput,
@@ -110,6 +111,7 @@ func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppend
 		r.model.ClearPassword()
 	})
 	r.passwordsPanel.SetContent(&r.passwordsPanelContent)
+	r.passwordsPanel.SetAutoBorder(true)
 
 	gl := layout.GridLayout{
 		Bounds: context.Bounds(r).Inset(u / 2),
@@ -135,10 +137,10 @@ func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppend
 }
 
 func (r *Root) reset() {
-	r.countOutputNumberInput.SetValue(64)
-	r.numberCharsNumberInput.SetValue(16)
-	r.minNumsNumberInput.SetValue(-1)
-	r.minSymbolsNumberInput.SetValue(-1)
+	r.countOutputNumberInput.SetValueInt64(64)
+	r.numberCharsNumberInput.SetValueInt64(16)
+	r.minNumsNumberInput.SetValueInt64(-1)
+	r.minSymbolsNumberInput.SetValueInt64(-1)
 
 	if r.passwordsPanelContent.onClearTriggered != nil {
 		r.passwordsPanelContent.onClearTriggered()
@@ -165,18 +167,18 @@ func (r *Root) tryGeneratePassword() {
 type passwordWidget struct {
 	guigui.DefaultWidget
 
-	copyButton basicwidget.TextButton
+	copyButton basicwidget.Button
 	text       basicwidget.Text
 }
 
 func (p *passwordWidget) SetText(text string) {
-	p.text.SetText(text)
+	p.text.SetValue(text)
 }
 
 func (p *passwordWidget) Build(context *guigui.Context, appender *guigui.ChildWidgetAppender) error {
 	p.copyButton.SetText("Copy")
 	p.copyButton.SetOnUp(func() {
-		clipboard.Write(clipboard.FmtText, []byte(p.text.Text()))
+		clipboard.Write(clipboard.FmtText, []byte(p.text.Value()))
 	})
 	p.text.SetVerticalAlign(basicwidget.VerticalAlignMiddle)
 
@@ -268,6 +270,9 @@ func main() {
 	op := &guigui.RunOptions{
 		Title:         "Password Generator",
 		WindowMinSize: image.Pt(320, 240),
+		RunGameOptions: &ebiten.RunGameOptions{
+			ApplePressAndHoldEnabled: true,
+		},
 	}
 	if err := guigui.Run(&Root{}, op); err != nil {
 		fmt.Fprintln(os.Stderr, err)
