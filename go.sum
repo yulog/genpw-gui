@@ -18,6 +18,8 @@ github.com/hajimehoshi/ebiten/v2 v2.9.0-alpha.5.0.20250518103147-cd31850015bb h1
 github.com/hajimehoshi/ebiten/v2 v2.9.0-alpha.5.0.20250518103147-cd31850015bb/go.mod h1:9IRfS1bf3B3Jlu41nuLlAFt/JHoDN+h6kL/4M9n7osw=
 github.com/hajimehoshi/guigui v0.0.0-20250523185323-85a865874792 h1:iAiMfvWLHv2ey0pRmvyHlDlSE2ePWnrMcrq4NJlO+T8=
 github.com/hajimehoshi/guigui v0.0.0-20250523185323-85a865874792/go.mod h1:V8JwK0eE/SSHZQRqoxwqRDdF42adysum60x7EUxrlXA=
+github.com/hajimehoshi/guigui v0.0.0-20250608095309-106ad2b9d61e h1:JFpNqJm9T70f9dn0L69cRNhM1UBTonDfMgxBMLmUxjU=
+github.com/hajimehoshi/guigui v0.0.0-20250608095309-106ad2b9d61e/go.mod h1:V8JwK0eE/SSHZQRqoxwqRDdF42adysum60x7EUxrlXA=
 github.com/hajimehoshi/oklab v0.1.0 h1:+ApSswl9LlB+8AYIC9ZaRO/r1emGtTF52YQleB3bW7w=
 github.com/hajimehoshi/oklab v0.1.0/go.mod h1:PQQ2H7nXuDlAr4pkdDRTfXp5tXdfIUKQpZbpZE7ugT4=
 github.com/jeandeaual/go-locale v0.0.0-20250421151639-a9d6ed1b3d45 h1:vFdvrlsVU+p/KFBWTq0lTG4fvWvG88sawGlCzM+RUEU=

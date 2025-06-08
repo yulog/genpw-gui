@@ -43,28 +43,40 @@ func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppend
 	appender.AppendChildWidgetWithBounds(&r.background, context.Bounds(r))
 
 	r.countOutputText.SetValue("count of output")
-	r.countOutputNumberInput.SetOnValueChangedInt64(func(value int64) {
+	r.countOutputNumberInput.SetOnValueChangedInt64(func(value int64, committed bool) {
+		if !committed {
+			return
+		}
 		r.model.SetCountOutputValue(int(value))
 	})
 	r.countOutputNumberInput.SetMinimumValueInt64(1)
 	r.countOutputNumberInput.SetValueInt64(int64(r.model.CountOutputValue()))
 
 	r.numberCharsText.SetValue("number of characters")
-	r.numberCharsNumberInput.SetOnValueChangedInt64(func(value int64) {
+	r.numberCharsNumberInput.SetOnValueChangedInt64(func(value int64, committed bool) {
+		if !committed {
+			return
+		}
 		r.model.SetNumberCharsValue(int(value))
 	})
 	r.numberCharsNumberInput.SetMinimumValueInt64(1)
 	r.numberCharsNumberInput.SetValueInt64(int64(r.model.NumberCharsValue()))
 
 	r.minNumsText.SetValue("minimum count of numbers")
-	r.minNumsNumberInput.SetOnValueChangedInt64(func(value int64) {
+	r.minNumsNumberInput.SetOnValueChangedInt64(func(value int64, committed bool) {
+		if !committed {
+			return
+		}
 		r.model.SetMinNumsValue(int(value))
 	})
 	r.minNumsNumberInput.SetMinimumValueInt64(-1)
 	r.minNumsNumberInput.SetValueInt64(int64(r.model.MinNumsValue()))
 
 	r.minSymbolsText.SetValue("minimum count of symbols")
-	r.minSymbolsNumberInput.SetOnValueChangedInt64(func(value int64) {
+	r.minSymbolsNumberInput.SetOnValueChangedInt64(func(value int64, committed bool) {
+		if !committed {
+			return
+		}
 		r.model.SetMinSymbolsValue(int(value))
 	})
 	r.minSymbolsNumberInput.SetMinimumValueInt64(-1)
@@ -120,7 +132,7 @@ func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppend
 				if row >= 1 {
 					return layout.FixedSize(0)
 				}
-				return layout.FixedSize(context.Size(&r.form).Y)
+				return layout.FixedSize(context.ActualSize(&r.form).Y)
 			}),
 			layout.FlexibleSize(1),
 		},
@@ -198,7 +210,7 @@ func (p *passwordWidget) Build(context *guigui.Context, appender *guigui.ChildWi
 }
 
 func (p *passwordWidget) DefaultSize(context *guigui.Context) image.Point {
-	return image.Pt(6*int(basicwidget.UnitSize(context)), context.Size(&p.copyButton).Y)
+	return image.Pt(6*int(basicwidget.UnitSize(context)), context.ActualSize(&p.copyButton).Y)
 }
 
 type passwordsPanelContent struct {
@@ -239,7 +251,7 @@ func (p *passwordsPanelContent) Build(context *guigui.Context, appender *guigui.
 				if row >= len(p.passwordWidgets) {
 					return layout.FixedSize(0)
 				}
-				return layout.FixedSize(context.Size(&p.passwordWidgets[row]).Y)
+				return layout.FixedSize(context.ActualSize(&p.passwordWidgets[row]).Y)
 			}),
 		},
 		RowGap: u / 4,
@@ -256,7 +268,7 @@ func (c *passwordsPanelContent) DefaultSize(context *guigui.Context) image.Point
 	u := basicwidget.UnitSize(context)
 	var h int
 	for i := range c.passwordWidgets {
-		h += context.Size(&c.passwordWidgets[i]).Y
+		h += context.ActualSize(&c.passwordWidgets[i]).Y
 		h += int(u / 4)
 	}
 	return image.Pt(6*int(u), h)
