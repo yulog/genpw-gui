@@ -8,12 +8,12 @@ import (
 	"slices"
 	"sync"
 
+	"github.com/atotto/clipboard"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/guigui"
 	"github.com/hajimehoshi/guigui/basicwidget"
 	_ "github.com/hajimehoshi/guigui/basicwidget/cjkfont"
 	"github.com/hajimehoshi/guigui/layout"
-	"golang.design/x/clipboard"
 )
 
 type Root struct {
@@ -190,7 +190,7 @@ func (p *passwordWidget) SetText(text string) {
 func (p *passwordWidget) Build(context *guigui.Context, appender *guigui.ChildWidgetAppender) error {
 	p.copyButton.SetText("Copy")
 	p.copyButton.SetOnUp(func() {
-		clipboard.Write(clipboard.FmtText, []byte(p.text.Value()))
+		clipboard.WriteAll(p.text.Value())
 	})
 	p.text.SetVerticalAlign(basicwidget.VerticalAlignMiddle)
 
@@ -275,10 +275,6 @@ func (c *passwordsPanelContent) DefaultSize(context *guigui.Context) image.Point
 }
 
 func main() {
-	if err := clipboard.Init(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
 	op := &guigui.RunOptions{
 		Title:         "Password Generator",
 		WindowMinSize: image.Pt(320, 240),
