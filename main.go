@@ -39,8 +39,14 @@ type Root struct {
 	model Model
 }
 
-func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppender) error {
-	appender.AppendChildWidgetWithBounds(&r.background, context.Bounds(r))
+func (r *Root) AppendChildWidgets(context *guigui.Context, appender *guigui.ChildWidgetAppender) {
+	appender.AppendChildWidget(&r.background)
+	appender.AppendChildWidget(&r.form)
+	appender.AppendChildWidget(&r.passwordsPanel)
+}
+
+func (r *Root) Build(context *guigui.Context) error {
+	context.SetBounds(&r.background, context.Bounds(r), r)
 
 	r.countOutputText.SetValue("count of output")
 	r.countOutputNumberInput.SetOnValueChangedInt64(func(value int64, committed bool) {
@@ -138,11 +144,11 @@ func (r *Root) Build(context *guigui.Context, appender *guigui.ChildWidgetAppend
 		},
 		RowGap: u / 2,
 	}
-	appender.AppendChildWidgetWithBounds(&r.form, gl.CellBounds(0, 0))
+	context.SetBounds(&r.form, gl.CellBounds(0, 0), r)
 	{
 		bounds := gl.CellBounds(0, 1)
-		context.SetSize(&r.passwordsPanelContent, image.Pt(bounds.Dx(), guigui.DefaultSize)) // Flexibleにならないため
-		appender.AppendChildWidgetWithBounds(&r.passwordsPanel, bounds)
+		context.SetSize(&r.passwordsPanelContent, image.Pt(bounds.Dx(), guigui.AutoSize), r) // Flexibleにならないため
+		context.SetBounds(&r.passwordsPanel, bounds, r)
 	}
 
 	return nil
@@ -187,7 +193,12 @@ func (p *passwordWidget) SetText(text string) {
 	p.text.SetValue(text)
 }
 
-func (p *passwordWidget) Build(context *guigui.Context, appender *guigui.ChildWidgetAppender) error {
+func (p *passwordWidget) AppendChildWidgets(context *guigui.Context, appender *guigui.ChildWidgetAppender) {
+	appender.AppendChildWidget(&p.copyButton)
+	appender.AppendChildWidget(&p.text)
+}
+
+func (p *passwordWidget) Build(context *guigui.Context) error {
 	p.copyButton.SetText("Copy")
 	p.copyButton.SetOnUp(func() {
 		clipboard.WriteAll(p.text.Value())
@@ -203,8 +214,8 @@ func (p *passwordWidget) Build(context *guigui.Context, appender *guigui.ChildWi
 		},
 		ColumnGap: u / 2,
 	}
-	appender.AppendChildWidgetWithBounds(&p.copyButton, gl.CellBounds(0, 0))
-	appender.AppendChildWidgetWithBounds(&p.text, gl.CellBounds(1, 0))
+	context.SetBounds(&p.copyButton, gl.CellBounds(0, 0), p)
+	context.SetBounds(&p.text, gl.CellBounds(1, 0), p)
 
 	return nil
 }
@@ -230,7 +241,13 @@ func (p *passwordsPanelContent) SetModel(model *Model) {
 	p.model = model
 }
 
-func (p *passwordsPanelContent) Build(context *guigui.Context, appender *guigui.ChildWidgetAppender) error {
+func (p *passwordsPanelContent) AppendChildWidgets(context *guigui.Context, appender *guigui.ChildWidgetAppender) {
+	for i := range p.passwordWidgets {
+		appender.AppendChildWidget(&p.passwordWidgets[i])
+	}
+}
+
+func (p *passwordsPanelContent) Build(context *guigui.Context) error {
 	if p.model.PasswordCount() > len(p.passwordWidgets) {
 		p.passwordWidgets = slices.Grow(p.passwordWidgets, p.model.PasswordCount()-len(p.passwordWidgets))
 		p.passwordWidgets = p.passwordWidgets[:p.model.PasswordCount()]
@@ -258,7 +275,7 @@ func (p *passwordsPanelContent) Build(context *guigui.Context, appender *guigui.
 	}
 	for i := range p.passwordWidgets {
 		bounds := gl.CellBounds(0, i)
-		appender.AppendChildWidgetWithBounds(&p.passwordWidgets[i], bounds)
+		context.SetBounds(&p.passwordWidgets[i], bounds, p)
 	}
 
 	return nil
