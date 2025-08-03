@@ -169,10 +169,10 @@ func (r *Root) Build(context *guigui.Context) error {
 }
 
 func (r *Root) reset() {
-	r.countOutputNumberInput.SetValueInt64(64)
-	r.numberCharsNumberInput.SetValueInt64(16)
-	r.minNumsNumberInput.SetValueInt64(-1)
-	r.minSymbolsNumberInput.SetValueInt64(-1)
+	r.model.SetCountOutputValue(64)
+	r.model.SetNumberCharsValue(16)
+	r.model.SetMinNumsValue(-1)
+	r.model.SetMinSymbolsValue(-1)
 
 	if r.passwordsPanelContent.onClearTriggered != nil {
 		r.passwordsPanelContent.onClearTriggered()
