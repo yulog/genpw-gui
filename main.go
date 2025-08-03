@@ -54,6 +54,14 @@ func (r *Root) Model(key any) any {
 	}
 }
 
+const (
+	passwordsPanelContentEventClearTriggered = "clearTriggered"
+)
+
+func (r *Root) SetOnClearTriggered(f func()) {
+	guigui.RegisterEventHandler(r, passwordsPanelContentEventClearTriggered, f)
+}
+
 func (r *Root) AppendChildWidgets(context *guigui.Context, appender *guigui.ChildWidgetAppender) {
 	appender.AppendChildWidget(&r.background)
 	appender.AppendChildWidget(&r.form)
@@ -139,7 +147,7 @@ func (r *Root) Build(context *guigui.Context) error {
 		},
 	})
 
-	r.passwordsPanelContent.SetOnClearTriggered(func() {
+	r.SetOnClearTriggered(func() {
 		r.model.ClearPassword()
 	})
 	r.passwordsPanel.SetContent(&r.passwordsPanelContent)
@@ -174,9 +182,7 @@ func (r *Root) reset() {
 	r.model.SetMinNumsValue(-1)
 	r.model.SetMinSymbolsValue(-1)
 
-	if r.passwordsPanelContent.onClearTriggered != nil {
-		r.passwordsPanelContent.onClearTriggered()
-	}
+	guigui.InvokeEventHandler(r, passwordsPanelContentEventClearTriggered)
 }
 
 func (r *Root) tryGeneratePassword() {
@@ -190,9 +196,7 @@ func (r *Root) tryGeneratePassword() {
 	if err != nil {
 		return
 	}
-	if r.passwordsPanelContent.onClearTriggered != nil {
-		r.passwordsPanelContent.onClearTriggered()
-	}
+	guigui.InvokeEventHandler(r, passwordsPanelContentEventClearTriggered)
 	r.model.TryAddPassword(&buf)
 }
 
@@ -241,12 +245,7 @@ func (p *passwordWidget) DefaultSize(context *guigui.Context) image.Point {
 type passwordsPanelContent struct {
 	guigui.DefaultWidget
 
-	passwordWidgets  []passwordWidget
-	onClearTriggered func()
-}
-
-func (p *passwordsPanelContent) SetOnClearTriggered(f func()) {
-	p.onClearTriggered = f
+	passwordWidgets []passwordWidget
 }
 
 func (p *passwordsPanelContent) AppendChildWidgets(context *guigui.Context, appender *guigui.ChildWidgetAppender) {
