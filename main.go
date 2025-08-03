@@ -8,12 +8,12 @@ import (
 	"slices"
 	"sync"
 
-	"github.com/atotto/clipboard"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/guigui"
 	"github.com/hajimehoshi/guigui/basicwidget"
 	_ "github.com/hajimehoshi/guigui/basicwidget/cjkfont"
 	"github.com/hajimehoshi/guigui/layout"
+	"github.com/yulog/genpw-gui/internal/clipboard"
 )
 
 type Root struct {
