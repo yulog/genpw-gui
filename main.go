@@ -250,12 +250,6 @@ func (p *passwordsPanelContent) SetOnClearTriggered(f func()) {
 }
 
 func (p *passwordsPanelContent) AppendChildWidgets(context *guigui.Context, appender *guigui.ChildWidgetAppender) {
-	for i := range p.passwordWidgets {
-		appender.AppendChildWidget(&p.passwordWidgets[i])
-	}
-}
-
-func (p *passwordsPanelContent) Build(context *guigui.Context) error {
 	model := context.Model(p, modelKeyModel).(*Model)
 	if model.PasswordCount() > len(p.passwordWidgets) {
 		p.passwordWidgets = slices.Grow(p.passwordWidgets, model.PasswordCount()-len(p.passwordWidgets))
@@ -263,7 +257,13 @@ func (p *passwordsPanelContent) Build(context *guigui.Context) error {
 	} else {
 		p.passwordWidgets = slices.Delete(p.passwordWidgets, model.PasswordCount(), len(p.passwordWidgets))
 	}
+	for i := range p.passwordWidgets {
+		appender.AppendChildWidget(&p.passwordWidgets[i])
+	}
+}
 
+func (p *passwordsPanelContent) Build(context *guigui.Context) error {
+	model := context.Model(p, modelKeyModel).(*Model)
 	for i := range model.PasswordCount() {
 		pw := model.PasswordByIndex(i)
 		p.passwordWidgets[i].SetText(pw.Text)
