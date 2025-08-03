@@ -16,6 +16,12 @@ import (
 	"github.com/yulog/genpw-gui/internal/clipboard"
 )
 
+type modelKey int
+
+const (
+	modelKeyModel modelKey = iota
+)
+
 type Root struct {
 	guigui.DefaultWidget
 
@@ -37,6 +43,15 @@ type Root struct {
 	passwordsPanelContent  passwordsPanelContent
 
 	model Model
+}
+
+func (r *Root) Model(key any) any {
+	switch key {
+	case modelKeyModel:
+		return &r.model
+	default:
+		return nil
+	}
 }
 
 func (r *Root) AppendChildWidgets(context *guigui.Context, appender *guigui.ChildWidgetAppender) {
@@ -124,7 +139,6 @@ func (r *Root) Build(context *guigui.Context) error {
 		},
 	})
 
-	r.passwordsPanelContent.SetModel(&r.model)
 	r.passwordsPanelContent.SetOnClearTriggered(func() {
 		r.model.ClearPassword()
 	})
@@ -229,16 +243,10 @@ type passwordsPanelContent struct {
 
 	passwordWidgets  []passwordWidget
 	onClearTriggered func()
-
-	model *Model
 }
 
 func (p *passwordsPanelContent) SetOnClearTriggered(f func()) {
 	p.onClearTriggered = f
-}
-
-func (p *passwordsPanelContent) SetModel(model *Model) {
-	p.model = model
 }
 
 func (p *passwordsPanelContent) AppendChildWidgets(context *guigui.Context, appender *guigui.ChildWidgetAppender) {
@@ -248,15 +256,16 @@ func (p *passwordsPanelContent) AppendChildWidgets(context *guigui.Context, appe
 }
 
 func (p *passwordsPanelContent) Build(context *guigui.Context) error {
-	if p.model.PasswordCount() > len(p.passwordWidgets) {
-		p.passwordWidgets = slices.Grow(p.passwordWidgets, p.model.PasswordCount()-len(p.passwordWidgets))
-		p.passwordWidgets = p.passwordWidgets[:p.model.PasswordCount()]
+	model := context.Model(p, modelKeyModel).(*Model)
+	if model.PasswordCount() > len(p.passwordWidgets) {
+		p.passwordWidgets = slices.Grow(p.passwordWidgets, model.PasswordCount()-len(p.passwordWidgets))
+		p.passwordWidgets = p.passwordWidgets[:model.PasswordCount()]
 	} else {
-		p.passwordWidgets = slices.Delete(p.passwordWidgets, p.model.PasswordCount(), len(p.passwordWidgets))
+		p.passwordWidgets = slices.Delete(p.passwordWidgets, model.PasswordCount(), len(p.passwordWidgets))
 	}
 
-	for i := range p.model.PasswordCount() {
-		pw := p.model.PasswordByIndex(i)
+	for i := range model.PasswordCount() {
+		pw := model.PasswordByIndex(i)
 		p.passwordWidgets[i].SetText(pw.Text)
 	}
 
