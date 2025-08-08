@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="twitter:card" content="player">
+    <meta name="twitter:title" content="Password Generator Demo">
+    <meta name="twitter:description" content="Password Generator Demo">
+    <meta name="twitter:image" content="https://yulog.github.io/genpw-gui/screenshot.png">
+    <meta name="twitter:player" content="https://yulog.github.io/genpw-gui/">
+    <meta name="twitter:player:width" content="320">
+    <meta name="twitter:player:height" content="240">
+    <title>Password Generator Demo</title>
+    <style type="text/css">
+        #loader {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100dvh;
+        }
+    </style>
+</head>
+<script src="wasm_exec.js"></script>
+<script>
+    const go = new Go();
+    WebAssembly.instantiateStreaming(fetch("genpw-gui.wasm"), go.importObject).then(result => {
+        document.getElementById("loader").remove();
+        go.run(result.instance);
+    });
+</script>
+<div id="loader">
+    <progress">Please wait...</progress>
+</div>
+
+</html>
