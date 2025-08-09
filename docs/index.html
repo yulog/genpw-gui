@@ -10,8 +10,8 @@
     <meta name="twitter:player" content="https://yulog.github.io/genpw-gui/">
     <meta name="twitter:player:width" content="320">
     <meta name="twitter:player:height" content="240">
-    <link rel="alternate" type="application/json+oembed"
-  href="https://yulog.github.io/genpw-gui/oembed.json" />
+    <link rel="alternate" type="application/json+oembed" href="https://yulog.github.io/genpw-gui/oembed.json" />
+    <link rel="manifest" href="https://yulog.github.io/genpw-gui/genpw-gui.webmanifest" />
     <title>Password Generator Demo</title>
     <style type="text/css">
         #loader {
@@ -24,6 +24,9 @@
 </head>
 <script src="wasm_exec.js"></script>
 <script>
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js");
+    }
     const go = new Go();
     WebAssembly.instantiateStreaming(fetch("genpw-gui.wasm"), go.importObject).then(result => {
         document.getElementById("loader").remove();
