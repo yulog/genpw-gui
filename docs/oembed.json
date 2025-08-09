@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "type": "rich",
+  "html": "<iframe src='https://yulog.github.io/genpw-gui/' allow='fullscreen;clipboard-write'></iframe>",
+  "width": 320,
+  "height": 240,
+  "thumbnail_url": "https://yulog.github.io/genpw-gui/screenshot.png",
+  "thumbnail_width": 964,
+  "thumbnail_height": 767
+}
