@@ -1,7 +1,9 @@
-const cacheName = "genpw-gui-v1";
+const cacheName = "genpw-gui-v2";
 const contentToCache = [
     "genpw-gui.wasm",
     "wasm_exec.js",
+    "icons/icon-512.png",
+    "icons/icon-512-maskable.png",
 ];
 
 self.addEventListener("install", (e) => {

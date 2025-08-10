@@ -2,6 +2,19 @@
   "name": "Password Generator Demo",
   "short_name": "genpw",
   "description": "Password Generator Demo",
+  "icons": [
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
   "start_url": "https://yulog.github.io/genpw-gui/",
   "display": "standalone"
 }
