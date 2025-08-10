@@ -1,7 +1,7 @@
 // https://developer.mozilla.org/ja/docs/Web/Progressive_web_apps/Tutorials/js13kGames
 const cacheName = "genpw-gui-v3";
 const contentToCache = [
-    "/",
+    "./",
     "index.html",
     "genpw-gui.wasm",
     "wasm_exec.js",
