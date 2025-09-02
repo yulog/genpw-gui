@@ -238,7 +238,7 @@ func (p *passwordWidget) Build(context *guigui.Context) error {
 	return nil
 }
 
-func (p *passwordWidget) DefaultSize(context *guigui.Context) image.Point {
+func (p *passwordWidget) Measure(context *guigui.Context, constraints guigui.Constraints) image.Point {
 	return image.Pt(6*int(basicwidget.UnitSize(context)), context.ActualSize(&p.copyButton).Y)
 }
 
@@ -289,7 +289,7 @@ func (p *passwordsPanelContent) Build(context *guigui.Context) error {
 	return nil
 }
 
-func (c *passwordsPanelContent) DefaultSize(context *guigui.Context) image.Point {
+func (c *passwordsPanelContent) Measure(context *guigui.Context, constraints guigui.Constraints) image.Point {
 	u := basicwidget.UnitSize(context)
 	var h int
 	for i := range c.passwordWidgets {
