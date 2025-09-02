@@ -182,7 +182,7 @@ func (r *Root) reset() {
 	r.model.SetMinNumsValue(-1)
 	r.model.SetMinSymbolsValue(-1)
 
-	guigui.InvokeEventHandler(r, passwordsPanelContentEventClearTriggered)
+	guigui.DispatchEventHandler(r, passwordsPanelContentEventClearTriggered)
 }
 
 func (r *Root) tryGeneratePassword() {
@@ -196,7 +196,7 @@ func (r *Root) tryGeneratePassword() {
 	if err != nil {
 		return
 	}
-	guigui.InvokeEventHandler(r, passwordsPanelContentEventClearTriggered)
+	guigui.DispatchEventHandler(r, passwordsPanelContentEventClearTriggered)
 	r.model.TryAddPassword(&buf)
 }
 
