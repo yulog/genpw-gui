@@ -1,10 +1,10 @@
 module github.com/yulog/genpw-gui
 
-go 1.24.1
+go 1.25
 
 require (
 	github.com/hajimehoshi/ebiten/v2 v2.9.0-alpha.15
-	github.com/hajimehoshi/guigui v0.0.0-20250823144330-c236d10e0d04
+	github.com/hajimehoshi/guigui v0.0.0-20250901090732-209588e0b005
 )
 
 require github.com/rivo/uniseg v0.4.7 // indirect
