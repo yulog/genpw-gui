@@ -3,8 +3,8 @@ module github.com/yulog/genpw-gui
 go 1.25
 
 require (
-	github.com/hajimehoshi/ebiten/v2 v2.9.0-alpha.15
-	github.com/hajimehoshi/guigui v0.0.0-20250901090732-209588e0b005
+	github.com/hajimehoshi/ebiten/v2 v2.9.0-alpha.16
+	github.com/hajimehoshi/guigui v0.0.0-20250906133650-f66c82868acf
 )
 
 require github.com/rivo/uniseg v0.4.7 // indirect

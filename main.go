@@ -257,7 +257,7 @@ func (p *passwordWidget) Layout(context *guigui.Context, widget guigui.Widget) i
 }
 
 func (p *passwordWidget) Measure(context *guigui.Context, constraints guigui.Constraints) image.Point {
-	return image.Pt(6*int(basicwidget.UnitSize(context)), context.ActualSize(&p.copyButton).Y)
+	return image.Pt(6*int(basicwidget.UnitSize(context)), p.copyButton.Measure(context, guigui.Constraints{}).Y)
 }
 
 type passwordsPanelContent struct {
@@ -302,7 +302,9 @@ func (p *passwordsPanelContent) Build(context *guigui.Context) error {
 				if row >= len(p.passwordWidgets) {
 					return layout.FixedSize(0)
 				}
-				return layout.FixedSize(context.ActualSize(&p.passwordWidgets[row]).Y)
+				w := guigui.FixedWidthConstraints(context.Bounds(p).Dx())
+				h := p.passwordWidgets[row].Measure(context, w).Y
+				return layout.FixedSize(h)
 			}),
 		},
 		RowGap: u / 4,
@@ -328,7 +330,7 @@ func (p *passwordsPanelContent) Measure(context *guigui.Context, constraints gui
 	u := basicwidget.UnitSize(context)
 	var h int
 	for i := range p.passwordWidgets {
-		h += context.ActualSize(&p.passwordWidgets[i]).Y
+		h += p.passwordWidgets[i].Measure(context, constraints).Y
 		h += int(u / 4)
 	}
 	return image.Pt(p.width, h)
