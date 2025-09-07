@@ -1,5 +1,5 @@
 // https://developer.mozilla.org/ja/docs/Web/Progressive_web_apps/Tutorials/js13kGames
-const cacheName = "genpw-gui-v3";
+const cacheName = "genpw-gui-v4";
 const contentToCache = [
     "./",
     "index.html",
