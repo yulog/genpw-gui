@@ -1,12 +1,12 @@
 // https://developer.mozilla.org/ja/docs/Web/Progressive_web_apps/Tutorials/js13kGames
-const cacheName = "genpw-gui-v4";
+const cacheName = "genpw-gui-v5";
 const contentToCache = [
-    "./",
-    "index.html",
-    "genpw-gui.wasm",
-    "wasm_exec.js",
-    "icons/icon-512.png",
-    "icons/icon-512-maskable.png",
+  "./",
+  "index.html",
+  "genpw-gui.wasm",
+  "wasm_exec.js",
+  "icons/icon-512.png",
+  "icons/icon-512-maskable.png",
 ];
 
 self.addEventListener("install", (e) => {
