@@ -173,7 +173,7 @@ func (r *Root) Layout(context *guigui.Context, widget guigui.Widget) image.Recta
 			},
 		},
 		Gap: u / 2,
-	}).WidgetBounds(context.Bounds(r).Inset(u/2), widget)
+	}).WidgetBounds(context, context.Bounds(r).Inset(u/2), widget)
 }
 
 func (r *Root) reset() {
@@ -241,7 +241,7 @@ func (p *passwordWidget) Layout(context *guigui.Context, widget guigui.Widget) i
 			},
 		},
 		Gap: u / 2,
-	}).WidgetBounds(context.Bounds(p), widget)
+	}).WidgetBounds(context, context.Bounds(p), widget)
 }
 
 func (p *passwordWidget) Measure(context *guigui.Context, constraints guigui.Constraints) image.Point {
@@ -292,7 +292,7 @@ func (p *passwordsPanelContent) Layout(context *guigui.Context, widget guigui.Wi
 			Size:   guigui.FixedSize(h),
 		}
 	}
-	return layout.WidgetBounds(context.Bounds(p), widget)
+	return layout.WidgetBounds(context, context.Bounds(p), widget)
 }
 
 func (p *passwordsPanelContent) Measure(context *guigui.Context, constraints guigui.Constraints) image.Point {
