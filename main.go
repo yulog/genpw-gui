@@ -64,10 +64,10 @@ func (r *Root) SetOnClearTriggered(f func()) {
 	guigui.RegisterEventHandler(r, passwordsPanelContentEventClearTriggered, f)
 }
 
-func (r *Root) AppendChildWidgets(context *guigui.Context, appender *guigui.ChildWidgetAppender) {
-	appender.AppendChildWidget(&r.background)
-	appender.AppendChildWidget(&r.form)
-	appender.AppendChildWidget(&r.passwordsPanel)
+func (r *Root) AddChildren(context *guigui.Context, adder *guigui.ChildAdder) {
+	adder.AddChild(&r.background)
+	adder.AddChild(&r.form)
+	adder.AddChild(&r.passwordsPanel)
 }
 
 func (r *Root) Update(context *guigui.Context) error {
@@ -221,9 +221,9 @@ func (p *passwordWidget) SetText(text string) {
 	p.text.SetValue(text)
 }
 
-func (p *passwordWidget) AppendChildWidgets(context *guigui.Context, appender *guigui.ChildWidgetAppender) {
-	appender.AppendChildWidget(&p.copyButton)
-	appender.AppendChildWidget(&p.text)
+func (p *passwordWidget) AddChildren(context *guigui.Context, adder *guigui.ChildAdder) {
+	adder.AddChild(&p.copyButton)
+	adder.AddChild(&p.text)
 }
 
 func (p *passwordWidget) Update(context *guigui.Context) error {
@@ -274,7 +274,7 @@ func (p *passwordsPanelContent) SetWidth(width int) {
 	p.width = width
 }
 
-func (p *passwordsPanelContent) AppendChildWidgets(context *guigui.Context, appender *guigui.ChildWidgetAppender) {
+func (p *passwordsPanelContent) AddChildren(context *guigui.Context, adder *guigui.ChildAdder) {
 	model := context.Model(p, modelKeyModel).(*Model)
 	if model.PasswordCount() > len(p.passwordWidgets) {
 		p.passwordWidgets = slices.Grow(p.passwordWidgets, model.PasswordCount()-len(p.passwordWidgets))
@@ -283,7 +283,7 @@ func (p *passwordsPanelContent) AppendChildWidgets(context *guigui.Context, appe
 		p.passwordWidgets = slices.Delete(p.passwordWidgets, model.PasswordCount(), len(p.passwordWidgets))
 	}
 	for i := range p.passwordWidgets {
-		appender.AppendChildWidget(&p.passwordWidgets[i])
+		adder.AddChild(&p.passwordWidgets[i])
 	}
 }
 
