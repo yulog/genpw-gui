@@ -70,7 +70,7 @@ func (r *Root) AppendChildWidgets(context *guigui.Context, appender *guigui.Chil
 	appender.AppendChildWidget(&r.passwordsPanel)
 }
 
-func (r *Root) Build(context *guigui.Context) error {
+func (r *Root) Update(context *guigui.Context) error {
 	r.countOutputText.SetValue("count of output")
 	r.countOutputNumberInput.SetOnValueChanged(func(value int, committed bool) {
 		if !committed {
@@ -226,7 +226,7 @@ func (p *passwordWidget) AppendChildWidgets(context *guigui.Context, appender *g
 	appender.AppendChildWidget(&p.text)
 }
 
-func (p *passwordWidget) Build(context *guigui.Context) error {
+func (p *passwordWidget) Update(context *guigui.Context) error {
 	p.copyButton.SetText("Copy")
 	p.copyButton.SetOnUp(func() {
 		clipboard.WriteAll(p.text.Value())
@@ -287,7 +287,7 @@ func (p *passwordsPanelContent) AppendChildWidgets(context *guigui.Context, appe
 	}
 }
 
-func (p *passwordsPanelContent) Build(context *guigui.Context) error {
+func (p *passwordsPanelContent) Update(context *guigui.Context) error {
 	model := context.Model(p, modelKeyModel).(*Model)
 	for i := range model.PasswordCount() {
 		pw := model.PasswordByIndex(i)
