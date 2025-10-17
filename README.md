@@ -24,7 +24,7 @@ Yasuhiro Matsumoto (a.k.a. mattn)
 Apache-2.0  
 2024 The Guigui Authors
 
-- https://github.com/hajimehoshi/guigui/tree/5f7c55ca0853d0ebf8a51dbb6724f7d2a4f9fd63/internal/clipboard
+- https://github.com/guigui-gui/guigui/tree/2180b48506a337620e0a501f711b1833b28b7ec0/internal/clipboard
 
 ## References
 
