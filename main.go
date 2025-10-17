@@ -40,7 +40,7 @@ type Root struct {
 	resetButton            basicwidget.Button
 	generateButton         basicwidget.Button
 	passwordsPanel         basicwidget.Panel
-	passwordsPanelContent  guigui.WidgetWithSize[*passwordsPanelContent]
+	passwordsPanelContent  passwordsPanelContent
 
 	model Model
 
@@ -152,6 +152,7 @@ func (r *Root) Update(context *guigui.Context) error {
 	})
 	r.passwordsPanel.SetContent(&r.passwordsPanelContent)
 	r.passwordsPanel.SetAutoBorder(true)
+	r.passwordsPanel.SetContentConstraints(basicwidget.PanelContentConstraintsFixedWidth)
 
 	r.layout = layout.GridLayout{
 		Bounds: context.Bounds(r).Inset(u / 2),
@@ -166,8 +167,6 @@ func (r *Root) Update(context *guigui.Context) error {
 		},
 		RowGap: u / 2,
 	}
-
-	r.passwordsPanelContent.SetFixedWidth(r.layout.CellBounds(0, 1).Dx())
 
 	return nil
 }

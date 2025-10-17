@@ -4,7 +4,7 @@ go 1.25
 
 require (
 	github.com/hajimehoshi/ebiten/v2 v2.9.0-alpha.16
-	github.com/hajimehoshi/guigui v0.0.0-20250913070304-d5d618b90f51
+	github.com/hajimehoshi/guigui v0.0.0-20250915083201-9d513e4724f4
 )
 
 require github.com/rivo/uniseg v0.4.7 // indirect
