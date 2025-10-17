@@ -40,7 +40,7 @@ type Root struct {
 	resetButton            basicwidget.Button
 	generateButton         basicwidget.Button
 	passwordsPanel         basicwidget.Panel
-	passwordsPanelContent  passwordsPanelContent
+	passwordsPanelContent  guigui.WidgetWithSize[*passwordsPanelContent]
 
 	model Model
 
@@ -167,7 +167,7 @@ func (r *Root) Update(context *guigui.Context) error {
 		RowGap: u / 2,
 	}
 
-	r.passwordsPanelContent.SetWidth(r.layout.CellBounds(0, 1).Dx())
+	r.passwordsPanelContent.SetFixedWidth(r.layout.CellBounds(0, 1).Dx())
 
 	return nil
 }
@@ -265,13 +265,7 @@ type passwordsPanelContent struct {
 
 	passwordWidgets []passwordWidget
 
-	width int
-
 	layout layout.GridLayout
-}
-
-func (p *passwordsPanelContent) SetWidth(width int) {
-	p.width = width
 }
 
 func (p *passwordsPanelContent) AddChildren(context *guigui.Context, adder *guigui.ChildAdder) {
@@ -333,7 +327,8 @@ func (p *passwordsPanelContent) Measure(context *guigui.Context, constraints gui
 		h += p.passwordWidgets[i].Measure(context, constraints).Y
 		h += int(u / 4)
 	}
-	return image.Pt(p.width, h)
+	w := p.DefaultWidget.Measure(context, constraints).X
+	return image.Pt(w, h)
 }
 
 func main() {
