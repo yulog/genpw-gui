@@ -72,44 +72,44 @@ func (r *Root) AppendChildWidgets(context *guigui.Context, appender *guigui.Chil
 
 func (r *Root) Build(context *guigui.Context) error {
 	r.countOutputText.SetValue("count of output")
-	r.countOutputNumberInput.SetOnValueChangedInt64(func(value int64, committed bool) {
+	r.countOutputNumberInput.SetOnValueChanged(func(value int, committed bool) {
 		if !committed {
 			return
 		}
-		r.model.SetCountOutputValue(int(value))
+		r.model.SetCountOutputValue(value)
 	})
-	r.countOutputNumberInput.SetMinimumValueInt64(1)
-	r.countOutputNumberInput.SetValueInt64(int64(r.model.CountOutputValue()))
+	r.countOutputNumberInput.SetMinimumValue(1)
+	r.countOutputNumberInput.SetValue(r.model.CountOutputValue())
 
 	r.numberCharsText.SetValue("number of characters")
-	r.numberCharsNumberInput.SetOnValueChangedInt64(func(value int64, committed bool) {
+	r.numberCharsNumberInput.SetOnValueChanged(func(value int, committed bool) {
 		if !committed {
 			return
 		}
-		r.model.SetNumberCharsValue(int(value))
+		r.model.SetNumberCharsValue(value)
 	})
-	r.numberCharsNumberInput.SetMinimumValueInt64(1)
-	r.numberCharsNumberInput.SetValueInt64(int64(r.model.NumberCharsValue()))
+	r.numberCharsNumberInput.SetMinimumValue(1)
+	r.numberCharsNumberInput.SetValue(r.model.NumberCharsValue())
 
 	r.minNumsText.SetValue("minimum count of numbers")
-	r.minNumsNumberInput.SetOnValueChangedInt64(func(value int64, committed bool) {
+	r.minNumsNumberInput.SetOnValueChanged(func(value int, committed bool) {
 		if !committed {
 			return
 		}
-		r.model.SetMinNumsValue(int(value))
+		r.model.SetMinNumsValue(value)
 	})
-	r.minNumsNumberInput.SetMinimumValueInt64(-1)
-	r.minNumsNumberInput.SetValueInt64(int64(r.model.MinNumsValue()))
+	r.minNumsNumberInput.SetMinimumValue(-1)
+	r.minNumsNumberInput.SetValue(r.model.MinNumsValue())
 
 	r.minSymbolsText.SetValue("minimum count of symbols")
-	r.minSymbolsNumberInput.SetOnValueChangedInt64(func(value int64, committed bool) {
+	r.minSymbolsNumberInput.SetOnValueChanged(func(value int, committed bool) {
 		if !committed {
 			return
 		}
-		r.model.SetMinSymbolsValue(int(value))
+		r.model.SetMinSymbolsValue(value)
 	})
-	r.minSymbolsNumberInput.SetMinimumValueInt64(-1)
-	r.minSymbolsNumberInput.SetValueInt64(int64(r.model.MinSymbolsValue()))
+	r.minSymbolsNumberInput.SetMinimumValue(-1)
+	r.minSymbolsNumberInput.SetValue(r.model.MinSymbolsValue())
 
 	r.once.Do(func() { r.reset() })
 
