@@ -57,8 +57,8 @@ const (
 	passwordsPanelContentEventClearTriggered = "clearTriggered"
 )
 
-func (r *Root) SetOnClearTriggered(f func()) {
-	guigui.RegisterEventHandler(r, passwordsPanelContentEventClearTriggered, f)
+func (r *Root) SetOnClearTriggered(f func(context *guigui.Context)) {
+	guigui.SetEventHandler(r, passwordsPanelContentEventClearTriggered, f)
 }
 
 func (r *Root) Build(context *guigui.Context, adder *guigui.ChildAdder) error {
@@ -67,7 +67,7 @@ func (r *Root) Build(context *guigui.Context, adder *guigui.ChildAdder) error {
 	adder.AddChild(&r.passwordsPanel)
 
 	r.countOutputText.SetValue("count of output")
-	r.countOutputNumberInput.SetOnValueChanged(func(value int, committed bool) {
+	r.countOutputNumberInput.SetOnValueChanged(func(context *guigui.Context, value int, committed bool) {
 		if !committed {
 			return
 		}
@@ -77,7 +77,7 @@ func (r *Root) Build(context *guigui.Context, adder *guigui.ChildAdder) error {
 	r.countOutputNumberInput.SetValue(r.model.CountOutputValue())
 
 	r.numberCharsText.SetValue("number of characters")
-	r.numberCharsNumberInput.SetOnValueChanged(func(value int, committed bool) {
+	r.numberCharsNumberInput.SetOnValueChanged(func(context *guigui.Context, value int, committed bool) {
 		if !committed {
 			return
 		}
@@ -87,7 +87,7 @@ func (r *Root) Build(context *guigui.Context, adder *guigui.ChildAdder) error {
 	r.numberCharsNumberInput.SetValue(r.model.NumberCharsValue())
 
 	r.minNumsText.SetValue("minimum count of numbers")
-	r.minNumsNumberInput.SetOnValueChanged(func(value int, committed bool) {
+	r.minNumsNumberInput.SetOnValueChanged(func(context *guigui.Context, value int, committed bool) {
 		if !committed {
 			return
 		}
@@ -97,7 +97,7 @@ func (r *Root) Build(context *guigui.Context, adder *guigui.ChildAdder) error {
 	r.minNumsNumberInput.SetValue(r.model.MinNumsValue())
 
 	r.minSymbolsText.SetValue("minimum count of symbols")
-	r.minSymbolsNumberInput.SetOnValueChanged(func(value int, committed bool) {
+	r.minSymbolsNumberInput.SetOnValueChanged(func(context *guigui.Context, value int, committed bool) {
 		if !committed {
 			return
 		}
@@ -109,12 +109,12 @@ func (r *Root) Build(context *guigui.Context, adder *guigui.ChildAdder) error {
 	r.once.Do(func() { r.reset() })
 
 	r.resetButton.SetText("Reset")
-	r.resetButton.SetOnUp(func() {
+	r.resetButton.SetOnUp(func(context *guigui.Context) {
 		r.reset()
 	})
 
 	r.generateButton.SetText("Generate")
-	r.generateButton.SetOnUp(func() {
+	r.generateButton.SetOnUp(func(context *guigui.Context) {
 		r.tryGeneratePassword()
 	})
 
@@ -141,7 +141,7 @@ func (r *Root) Build(context *guigui.Context, adder *guigui.ChildAdder) error {
 		},
 	})
 
-	r.SetOnClearTriggered(func() {
+	r.SetOnClearTriggered(func(context *guigui.Context) {
 		r.model.ClearPassword()
 	})
 	r.passwordsPanel.SetContent(&r.passwordsPanelContent)
@@ -177,7 +177,7 @@ func (r *Root) reset() {
 	r.model.SetMinNumsValue(-1)
 	r.model.SetMinSymbolsValue(-1)
 
-	guigui.DispatchEventHandler(r, passwordsPanelContentEventClearTriggered)
+	guigui.DispatchEvent(r, passwordsPanelContentEventClearTriggered)
 }
 
 func (r *Root) tryGeneratePassword() {
@@ -191,7 +191,7 @@ func (r *Root) tryGeneratePassword() {
 	if err != nil {
 		return
 	}
-	guigui.DispatchEventHandler(r, passwordsPanelContentEventClearTriggered)
+	guigui.DispatchEvent(r, passwordsPanelContentEventClearTriggered)
 	r.model.TryAddPassword(&buf)
 }
 
@@ -211,7 +211,7 @@ func (p *passwordWidget) Build(context *guigui.Context, adder *guigui.ChildAdder
 	adder.AddChild(&p.text)
 
 	p.copyButton.SetText("Copy")
-	p.copyButton.SetOnUp(func() {
+	p.copyButton.SetOnUp(func(context *guigui.Context) {
 		clipboard.WriteAll(p.text.Value())
 	})
 	p.text.SetVerticalAlign(basicwidget.VerticalAlignMiddle)
