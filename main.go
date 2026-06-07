@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"image"
 	"os"
-	"slices"
 	"sync"
 
 	"github.com/guigui-gui/guigui"
@@ -16,7 +15,7 @@ import (
 )
 
 var (
-	modelKeyModel = guigui.GenerateModelKey()
+	modelKeyModel = guigui.GenerateDataKey()
 )
 
 type Root struct {
@@ -42,7 +41,7 @@ type Root struct {
 	model Model
 }
 
-func (r *Root) Model(key guigui.ModelKey) any {
+func (r *Root) Data(context *guigui.Context, key guigui.DataKey) any {
 	switch key {
 	case modelKeyModel:
 		return &r.model
@@ -55,17 +54,17 @@ var (
 	passwordsPanelContentEventClearTriggered guigui.EventKey = guigui.GenerateEventKey()
 )
 
-func (r *Root) SetOnClearTriggered(f func(context *guigui.Context)) {
+func (r *Root) OnClearTriggered(f func(context *guigui.Context)) {
 	guigui.SetEventHandler(r, passwordsPanelContentEventClearTriggered, f)
 }
 
 func (r *Root) Build(context *guigui.Context, adder *guigui.ChildAdder) error {
-	adder.AddChild(&r.background)
-	adder.AddChild(&r.form)
-	adder.AddChild(&r.passwordsPanel)
+	adder.AddWidget(&r.background)
+	adder.AddWidget(&r.form)
+	adder.AddWidget(&r.passwordsPanel)
 
 	r.countOutputText.SetValue("count of output")
-	r.countOutputNumberInput.SetOnValueChanged(func(context *guigui.Context, value int, committed bool) {
+	r.countOutputNumberInput.OnValueChanged(func(context *guigui.Context, value int, committed bool) {
 		if !committed {
 			return
 		}
@@ -75,7 +74,7 @@ func (r *Root) Build(context *guigui.Context, adder *guigui.ChildAdder) error {
 	r.countOutputNumberInput.SetValue(r.model.CountOutputValue())
 
 	r.numberCharsText.SetValue("number of characters")
-	r.numberCharsNumberInput.SetOnValueChanged(func(context *guigui.Context, value int, committed bool) {
+	r.numberCharsNumberInput.OnValueChanged(func(context *guigui.Context, value int, committed bool) {
 		if !committed {
 			return
 		}
@@ -85,7 +84,7 @@ func (r *Root) Build(context *guigui.Context, adder *guigui.ChildAdder) error {
 	r.numberCharsNumberInput.SetValue(r.model.NumberCharsValue())
 
 	r.minNumsText.SetValue("minimum count of numbers")
-	r.minNumsNumberInput.SetOnValueChanged(func(context *guigui.Context, value int, committed bool) {
+	r.minNumsNumberInput.OnValueChanged(func(context *guigui.Context, value int, committed bool) {
 		if !committed {
 			return
 		}
@@ -95,7 +94,7 @@ func (r *Root) Build(context *guigui.Context, adder *guigui.ChildAdder) error {
 	r.minNumsNumberInput.SetValue(r.model.MinNumsValue())
 
 	r.minSymbolsText.SetValue("minimum count of symbols")
-	r.minSymbolsNumberInput.SetOnValueChanged(func(context *guigui.Context, value int, committed bool) {
+	r.minSymbolsNumberInput.OnValueChanged(func(context *guigui.Context, value int, committed bool) {
 		if !committed {
 			return
 		}
@@ -107,12 +106,13 @@ func (r *Root) Build(context *guigui.Context, adder *guigui.ChildAdder) error {
 	r.once.Do(func() { r.reset() })
 
 	r.resetButton.SetText("Reset")
-	r.resetButton.SetOnUp(func(context *guigui.Context) {
+	r.resetButton.OnUp(func(context *guigui.Context) {
 		r.reset()
 	})
 
 	r.generateButton.SetText("Generate")
-	r.generateButton.SetOnUp(func(context *guigui.Context) {
+	r.generateButton.SetType(basicwidget.ButtonTypePrimary)
+	r.generateButton.OnUp(func(context *guigui.Context) {
 		r.tryGeneratePassword()
 	})
 
@@ -139,7 +139,7 @@ func (r *Root) Build(context *guigui.Context, adder *guigui.ChildAdder) error {
 		},
 	})
 
-	r.SetOnClearTriggered(func(context *guigui.Context) {
+	r.OnClearTriggered(func(context *guigui.Context) {
 		r.model.ClearPassword()
 	})
 	r.passwordsPanel.SetContent(&r.passwordsPanelContent)
@@ -205,11 +205,11 @@ func (p *passwordWidget) SetText(text string) {
 }
 
 func (p *passwordWidget) Build(context *guigui.Context, adder *guigui.ChildAdder) error {
-	adder.AddChild(&p.copyButton)
-	adder.AddChild(&p.text)
+	adder.AddWidget(&p.copyButton)
+	adder.AddWidget(&p.text)
 
 	p.copyButton.SetText("Copy")
-	p.copyButton.SetOnUp(func(context *guigui.Context) {
+	p.copyButton.OnUp(func(context *guigui.Context) {
 		clipboard.WriteAll(p.text.Value())
 	})
 	p.text.SetVerticalAlign(basicwidget.VerticalAlignMiddle)
@@ -242,24 +242,20 @@ func (p *passwordWidget) Measure(context *guigui.Context, constraints guigui.Con
 type passwordsPanelContent struct {
 	guigui.DefaultWidget
 
-	passwordWidgets []passwordWidget
+	passwordWidgets guigui.WidgetSlice[*passwordWidget]
 }
 
 func (p *passwordsPanelContent) Build(context *guigui.Context, adder *guigui.ChildAdder) error {
-	model := context.Model(p, modelKeyModel).(*Model)
-	if model.PasswordCount() > len(p.passwordWidgets) {
-		p.passwordWidgets = slices.Grow(p.passwordWidgets, model.PasswordCount()-len(p.passwordWidgets))
-		p.passwordWidgets = p.passwordWidgets[:model.PasswordCount()]
-	} else {
-		p.passwordWidgets = slices.Delete(p.passwordWidgets, model.PasswordCount(), len(p.passwordWidgets))
-	}
-	for i := range p.passwordWidgets {
-		adder.AddChild(&p.passwordWidgets[i])
+	model := context.Data(p, modelKeyModel).(*Model)
+
+	p.passwordWidgets.SetLen(model.PasswordCount())
+	for i := range p.passwordWidgets.Len() {
+		adder.AddWidget(p.passwordWidgets.At(i))
 	}
 
 	for i := range model.PasswordCount() {
 		pw := model.PasswordByIndex(i)
-		p.passwordWidgets[i].SetText(pw.Text)
+		p.passwordWidgets.At(i).SetText(pw.Text)
 	}
 
 	return nil
@@ -271,12 +267,12 @@ func (p *passwordsPanelContent) Layout(context *guigui.Context, widgetBounds *gu
 		Direction: guigui.LayoutDirectionVertical,
 		Gap:       u / 4,
 	}
-	layout.Items = make([]guigui.LinearLayoutItem, len(p.passwordWidgets))
-	for i := range p.passwordWidgets {
+	layout.Items = make([]guigui.LinearLayoutItem, p.passwordWidgets.Len())
+	for i := range p.passwordWidgets.Len() {
 		w := widgetBounds.Bounds().Dx()
-		h := p.passwordWidgets[i].Measure(context, guigui.FixedWidthConstraints(w)).Y
+		h := p.passwordWidgets.At(i).Measure(context, guigui.FixedWidthConstraints(w)).Y
 		layout.Items[i] = guigui.LinearLayoutItem{
-			Widget: &p.passwordWidgets[i],
+			Widget: p.passwordWidgets.At(i),
 			Size:   guigui.FixedSize(h),
 		}
 	}
@@ -286,8 +282,8 @@ func (p *passwordsPanelContent) Layout(context *guigui.Context, widgetBounds *gu
 func (p *passwordsPanelContent) Measure(context *guigui.Context, constraints guigui.Constraints) image.Point {
 	u := basicwidget.UnitSize(context)
 	var h int
-	for i := range p.passwordWidgets {
-		h += p.passwordWidgets[i].Measure(context, constraints).Y
+	for i := range p.passwordWidgets.Len() {
+		h += p.passwordWidgets.At(i).Measure(context, constraints).Y
 		h += int(u / 4)
 	}
 	w := p.DefaultWidget.Measure(context, constraints).X
