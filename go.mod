@@ -3,8 +3,8 @@ module github.com/yulog/genpw-gui
 go 1.25.0
 
 require (
-	github.com/guigui-gui/guigui v0.0.0-20260430192326-f38d29714621
-	github.com/hajimehoshi/ebiten/v2 v2.10.0-alpha.11.0.20260430171138-1d93b0cb8bf0
+	github.com/guigui-gui/guigui v0.0.0-20260529164304-f6fa4eb0c666
+	github.com/hajimehoshi/ebiten/v2 v2.10.0-alpha.11.0.20260528044832-c865916e6bcb
 )
 
 require (
@@ -21,13 +21,13 @@ require (
 	github.com/atotto/clipboard v0.1.4
 	github.com/ebitengine/gomobile v0.0.0-20260211053922-3d992dae95d1 // indirect
 	github.com/ebitengine/hideconsole v1.0.0 // indirect
-	github.com/ebitengine/purego v0.11.0-alpha.1.0.20260430031838-fa49e74b0075 // indirect
-	github.com/go-text/typesetting v0.3.5-0.20260328164731-48df487c1500 // indirect
+	github.com/ebitengine/purego v0.11.0-alpha.3 // indirect
+	github.com/go-text/typesetting v0.3.5-0.20260505125104-04e4e76f9371 // indirect
 	github.com/jeandeaual/go-locale v0.0.0-20250612000132-0ef82f21eade // indirect
-	github.com/jezek/xgb v1.3.0 // indirect
-	golang.org/x/image v0.39.0 // indirect
+	github.com/jezek/xgb v1.3.1 // indirect
+	golang.org/x/image v0.41.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
-	golang.org/x/sys v0.43.0 // indirect
-	golang.org/x/text v0.36.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
 	howett.net/plist v1.0.1 // indirect
 )
