@@ -3,8 +3,8 @@ module github.com/yulog/genpw-gui
 go 1.25
 
 require (
-	github.com/guigui-gui/guigui v0.0.0-20251231180803-73adfe4ba28e
-	github.com/hajimehoshi/ebiten/v2 v2.10.0-alpha.7.0.20251231180601-eff0af0febd9
+	github.com/guigui-gui/guigui v0.0.0-20260131180455-f22bdbf6f432
+	github.com/hajimehoshi/ebiten/v2 v2.10.0-alpha.10
 )
 
 require (
@@ -23,9 +23,9 @@ require (
 	github.com/go-text/typesetting v0.3.2 // indirect
 	github.com/jeandeaual/go-locale v0.0.0-20250612000132-0ef82f21eade // indirect
 	github.com/jezek/xgb v1.2.0 // indirect
-	golang.org/x/image v0.34.0 // indirect
+	golang.org/x/image v0.35.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
-	golang.org/x/sys v0.39.0 // indirect
-	golang.org/x/text v0.32.0 // indirect
+	golang.org/x/sys v0.40.0 // indirect
+	golang.org/x/text v0.33.0 // indirect
 	howett.net/plist v1.0.1 // indirect
 )

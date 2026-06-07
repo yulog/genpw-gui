@@ -15,10 +15,8 @@ import (
 	"github.com/yulog/genpw-gui/internal/clipboard"
 )
 
-type modelKey int
-
-const (
-	modelKeyModel modelKey = iota
+var (
+	modelKeyModel = guigui.GenerateModelKey()
 )
 
 type Root struct {
@@ -44,7 +42,7 @@ type Root struct {
 	model Model
 }
 
-func (r *Root) Model(key any) any {
+func (r *Root) Model(key guigui.ModelKey) any {
 	switch key {
 	case modelKeyModel:
 		return &r.model
@@ -53,8 +51,8 @@ func (r *Root) Model(key any) any {
 	}
 }
 
-const (
-	passwordsPanelContentEventClearTriggered = "clearTriggered"
+var (
+	passwordsPanelContentEventClearTriggered guigui.EventKey = guigui.GenerateEventKey()
 )
 
 func (r *Root) SetOnClearTriggered(f func(context *guigui.Context)) {
