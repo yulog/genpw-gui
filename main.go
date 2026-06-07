@@ -61,13 +61,13 @@ func (r *Root) SetOnClearTriggered(f func()) {
 	guigui.RegisterEventHandler(r, passwordsPanelContentEventClearTriggered, f)
 }
 
-func (r *Root) AddChildren(context *guigui.Context, adder *guigui.ChildAdder) {
+func (r *Root) AddChildren(context *guigui.Context, widgetBounds *guigui.WidgetBounds, adder *guigui.ChildAdder) {
 	adder.AddChild(&r.background)
 	adder.AddChild(&r.form)
 	adder.AddChild(&r.passwordsPanel)
 }
 
-func (r *Root) Update(context *guigui.Context) error {
+func (r *Root) Update(context *guigui.Context, widgetBounds *guigui.WidgetBounds) error {
 	r.countOutputText.SetValue("count of output")
 	r.countOutputNumberInput.SetOnValueChanged(func(value int, committed bool) {
 		if !committed {
@@ -153,10 +153,10 @@ func (r *Root) Update(context *guigui.Context) error {
 	return nil
 }
 
-func (r *Root) Layout(context *guigui.Context, widget guigui.Widget) image.Rectangle {
+func (r *Root) Layout(context *guigui.Context, widgetBounds *guigui.WidgetBounds, widget guigui.Widget) image.Rectangle {
 	switch widget {
 	case &r.background:
-		return context.Bounds(r)
+		return widgetBounds.Bounds()
 	}
 
 	u := basicwidget.UnitSize(context)
@@ -173,7 +173,7 @@ func (r *Root) Layout(context *guigui.Context, widget guigui.Widget) image.Recta
 			},
 		},
 		Gap: u / 2,
-	}).WidgetBounds(context, context.Bounds(r).Inset(u/2), widget)
+	}).WidgetBounds(context, widgetBounds.Bounds().Inset(u/2), widget)
 }
 
 func (r *Root) reset() {
@@ -211,12 +211,12 @@ func (p *passwordWidget) SetText(text string) {
 	p.text.SetValue(text)
 }
 
-func (p *passwordWidget) AddChildren(context *guigui.Context, adder *guigui.ChildAdder) {
+func (p *passwordWidget) AddChildren(context *guigui.Context, widgetBounds *guigui.WidgetBounds, adder *guigui.ChildAdder) {
 	adder.AddChild(&p.copyButton)
 	adder.AddChild(&p.text)
 }
 
-func (p *passwordWidget) Update(context *guigui.Context) error {
+func (p *passwordWidget) Update(context *guigui.Context, widgetBounds *guigui.WidgetBounds) error {
 	p.copyButton.SetText("Copy")
 	p.copyButton.SetOnUp(func() {
 		clipboard.WriteAll(p.text.Value())
@@ -226,7 +226,7 @@ func (p *passwordWidget) Update(context *guigui.Context) error {
 	return nil
 }
 
-func (p *passwordWidget) Layout(context *guigui.Context, widget guigui.Widget) image.Rectangle {
+func (p *passwordWidget) Layout(context *guigui.Context, widgetBounds *guigui.WidgetBounds, widget guigui.Widget) image.Rectangle {
 	u := basicwidget.UnitSize(context)
 	return (guigui.LinearLayout{
 		Direction: guigui.LayoutDirectionHorizontal,
@@ -241,7 +241,7 @@ func (p *passwordWidget) Layout(context *guigui.Context, widget guigui.Widget) i
 			},
 		},
 		Gap: u / 2,
-	}).WidgetBounds(context, context.Bounds(p), widget)
+	}).WidgetBounds(context, widgetBounds.Bounds(), widget)
 }
 
 func (p *passwordWidget) Measure(context *guigui.Context, constraints guigui.Constraints) image.Point {
@@ -254,7 +254,7 @@ type passwordsPanelContent struct {
 	passwordWidgets []passwordWidget
 }
 
-func (p *passwordsPanelContent) AddChildren(context *guigui.Context, adder *guigui.ChildAdder) {
+func (p *passwordsPanelContent) AddChildren(context *guigui.Context, widgetBounds *guigui.WidgetBounds, adder *guigui.ChildAdder) {
 	model := context.Model(p, modelKeyModel).(*Model)
 	if model.PasswordCount() > len(p.passwordWidgets) {
 		p.passwordWidgets = slices.Grow(p.passwordWidgets, model.PasswordCount()-len(p.passwordWidgets))
@@ -267,7 +267,7 @@ func (p *passwordsPanelContent) AddChildren(context *guigui.Context, adder *guig
 	}
 }
 
-func (p *passwordsPanelContent) Update(context *guigui.Context) error {
+func (p *passwordsPanelContent) Update(context *guigui.Context, widgetBounds *guigui.WidgetBounds) error {
 	model := context.Model(p, modelKeyModel).(*Model)
 	for i := range model.PasswordCount() {
 		pw := model.PasswordByIndex(i)
@@ -277,7 +277,7 @@ func (p *passwordsPanelContent) Update(context *guigui.Context) error {
 	return nil
 }
 
-func (p *passwordsPanelContent) Layout(context *guigui.Context, widget guigui.Widget) image.Rectangle {
+func (p *passwordsPanelContent) Layout(context *guigui.Context, widgetBounds *guigui.WidgetBounds, widget guigui.Widget) image.Rectangle {
 	u := basicwidget.UnitSize(context)
 	layout := guigui.LinearLayout{
 		Direction: guigui.LayoutDirectionVertical,
@@ -285,14 +285,14 @@ func (p *passwordsPanelContent) Layout(context *guigui.Context, widget guigui.Wi
 	}
 	layout.Items = make([]guigui.LinearLayoutItem, len(p.passwordWidgets))
 	for i := range p.passwordWidgets {
-		w := context.Bounds(p).Dx()
+		w := widgetBounds.Bounds().Dx()
 		h := p.passwordWidgets[i].Measure(context, guigui.FixedWidthConstraints(w)).Y
 		layout.Items[i] = guigui.LinearLayoutItem{
 			Widget: &p.passwordWidgets[i],
 			Size:   guigui.FixedSize(h),
 		}
 	}
-	return layout.WidgetBounds(context, context.Bounds(p), widget)
+	return layout.WidgetBounds(context, widgetBounds.Bounds(), widget)
 }
 
 func (p *passwordsPanelContent) Measure(context *guigui.Context, constraints guigui.Constraints) image.Point {
