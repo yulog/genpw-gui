@@ -3,11 +3,14 @@ module github.com/yulog/genpw-gui
 go 1.25
 
 require (
-	github.com/guigui-gui/guigui v0.0.0-20251031095409-d1a1ce6c999a
+	github.com/guigui-gui/guigui v0.0.0-20251130061309-90f026bf1b11
 	github.com/hajimehoshi/ebiten/v2 v2.10.0-alpha.4
 )
 
-require github.com/rivo/uniseg v0.4.7 // indirect
+require (
+	github.com/hajimehoshi/iro v0.1.0 // indirect
+	github.com/rivo/uniseg v0.4.7 // indirect
+)
 
 require (
 	github.com/atotto/clipboard v0.1.4
@@ -15,7 +18,6 @@ require (
 	github.com/ebitengine/hideconsole v1.0.0 // indirect
 	github.com/ebitengine/purego v0.10.0-alpha.2.0.20251027033332-4956991301fb // indirect
 	github.com/go-text/typesetting v0.3.0 // indirect
-	github.com/hajimehoshi/oklab v0.1.0 // indirect
 	github.com/jeandeaual/go-locale v0.0.0-20250612000132-0ef82f21eade // indirect
 	github.com/jezek/xgb v1.1.1 // indirect
 	golang.org/x/image v0.32.0 // indirect
